@@ -7,6 +7,10 @@
 #include <string.h>
 #include <errno.h>
 
+
+#include "use.c"
+
+
 #define error(a) {perror(a); exit(1);};
 #define MAXLINE 200
 #define MAXARGS 20
@@ -64,6 +68,8 @@ int read_args(int* argcp, char* args[], int max, int* eofp)
 
 int execute(int argc, char *argv[])
 {
+    list_items();
+
     return 0;
 }
 
