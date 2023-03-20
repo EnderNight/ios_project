@@ -68,7 +68,7 @@ int read_args(int* argcp, char* args[], int max, int* eofp)
 
 int execute(int argc, char *argv[])
 {
-    list_items();
+    // print_items(get_item_list());
 
     return 0;
 }
