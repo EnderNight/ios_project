@@ -1,0 +1,5 @@
+# ninja log v5
+1	57	1679583798634448224	CMakeFiles/ios_project.dir/use.c.o	71f18bd7689e1282
+0	65	1679583798642448294	CMakeFiles/ios_project.dir/test_shell.c.o	89cc151884fcf90d
+1	47	1679584018873385787	CMakeFiles/ios_project.dir/test_shell.c.o	89cc151884fcf90d
+47	79	1679584018904386060	ios_project	2b28a9536be80512
