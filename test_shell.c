@@ -70,6 +70,7 @@ int execute(int argc, char *argv[])
 {
     // print_items(get_item_list());
 
+    printf("hi\n");
     return 0;
 }
 
