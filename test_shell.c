@@ -9,6 +9,7 @@
 
 
 //#include "use.c"
+#include "parse_open.c"
 
 
 #define error(a) {perror(a); exit(1);};
@@ -69,8 +70,11 @@ int read_args(int* argcp, char* args[], int max, int* eofp)
 int execute(int argc, char *argv[])
 {
     // print_items(get_item_list());
+    
+    item it = open_item();
+    printf("%s\n", it.text);
+    print_item_text(it);
 
-    printf("hi\n");
     return 0;
 }
 
