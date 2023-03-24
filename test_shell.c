@@ -8,7 +8,7 @@
 #include <errno.h>
 
 
-#include "use.c"
+//#include "use.c"
 
 
 #define error(a) {perror(a); exit(1);};
