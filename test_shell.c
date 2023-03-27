@@ -74,7 +74,6 @@ int execute(int argc, char *argv[])
     
     item it = open_item();
     printf("%s\n", it.text);
-    print_item_text(it);
 
     return 0;
 }
