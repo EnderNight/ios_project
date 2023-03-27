@@ -9,7 +9,8 @@
 
 
 //#include "use.c"
-#include "parse_open.c"
+#include "parse.h"
+
 
 
 #define error(a) {perror(a); exit(1);};
@@ -78,8 +79,7 @@ int execute(int argc, char *argv[])
     return 0;
 }
 
-int
-main ()
+int main()
 {
    char * Prompt = "myShell0> ";
    int eof= 0;

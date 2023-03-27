@@ -5,4 +5,4 @@ set(CMAKE_C_STANDARD 11)
 
 add_executable(ios_project
         test_shell.c
-        use.c inventory.c)
+        use.c inventory.c where_am_i.c parse.c parse.c)

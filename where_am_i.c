@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-int main() {
+void where_am_i() {
     char cwd[1024];
     chdir("/path/to/change/directory/to");
     getcwd(cwd, sizeof(cwd));
