@@ -41,7 +41,7 @@ item open_item() {
         printf("Error: text too long!");
 
     text[len] = '\0';
-    read_string();
+    read_string(item_file, &it);
     close(item_file);
 
     return it;
