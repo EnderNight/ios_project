@@ -52,8 +52,7 @@ if [ "${PWD}" != "${BASEDIR}" ]; then
     echo -e "${WARNING}: Script executed outside of the 'ios_project' repo root directory."
     echo -e "Changing working directory to ${BASEDIR}."
 
-    echo
-        pushd ${BASEDIR} > /dev/null
+    pushd "${BASEDIR}" > /dev/null
     echo
 
 fi
@@ -83,7 +82,7 @@ fi
 # Make compiling
 echo -e "${INFO}: Compiling project with 'make'"
 echo
-pushd ${CMAKE_CUST_BUILD_DIR} > /dev/null
+pushd "${CMAKE_CUST_BUILD_DIR}" > /dev/null
     if ( make ); then
         echo
         echo -e "${SUCCESS}: 'ios_project' executable built."
@@ -96,6 +95,10 @@ popd > /dev/null
 
 
 
+# Moving executable inside root directory
+echo
+echo -e "${INFO}: Moving compiled executable to root directory."
+mv "${CMAKE_CUST_BUILD_DIR}"/ios_project "${PWD}"
+
 
 if [ ${IS_OUTSIDE_REPO} -eq 1 ]; then popd > /dev/null; fi
-
