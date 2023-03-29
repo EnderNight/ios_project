@@ -4,3 +4,4 @@ build/
 build-linux/
 
 ios_project
+.CMakeLists.txt

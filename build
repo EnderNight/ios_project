@@ -44,6 +44,18 @@ BASEDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 
 
+# Verifying build clean
+if [ $# -gt 0 ]
+then
+    if [ $1 = "clean" ]
+    then
+        rm -rf ${CMAKE_CUST_BUILD_DIR} ios_project .CMakeLists.txt
+        exit 0
+    fi
+fi
+
+
+
 
 # Tests if script is launched at the correct location
 if [ "${PWD}" != "${BASEDIR}" ]; then
@@ -59,12 +71,7 @@ fi
 
 
 
-
-# CMake build
-if [ ! -d "${CMAKE_CUST_BUILD_DIR}" ]; then
-
-    echo -e "${INFO}: '${CMAKE_CUST_BUILD_DIR}' directory not found. Running cmake in release mode."
-    
+build_cmake () {
     echo
     if ( cmake -S . -B ${CMAKE_CUST_BUILD_DIR} ); then
         echo
@@ -75,7 +82,27 @@ if [ ! -d "${CMAKE_CUST_BUILD_DIR}" ]; then
         exit 1
     fi
     echo
+}
+
+# CMake build
+if [ ! -d "${CMAKE_CUST_BUILD_DIR}" ]
+then
+    echo -e "${INFO}: '${CMAKE_CUST_BUILD_DIR}' directory not found. Running cmake in release mode."
+
+    cp "CMakeLists.txt" ".CMakeLists.txt"
+    
+    build_cmake
 fi
+
+if [ -f ".CMakeLists.txt" ] && ! cmp -s "CMakeLists.txt" ".CMakeLists.txt"
+then
+    echo -e "${INFO}: CMakeLists.txt updated, running cmake in release mode."
+
+    cp "CMakeLists.txt" ".CMakeLists.txt"
+
+    build_cmake
+fi
+
 
 
 
