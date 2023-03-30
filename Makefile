@@ -11,7 +11,7 @@ SOURCES ?= $(shell find $(SRCDIR) -type f -name *.c)
 OBJECTS ?= $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.c=.o))
 HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
-CFLAGS += -I$(IDIR) -Wall -Wextra -Wpedantic -std=c17 -g -fsanitize=address
+CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -std=c17 -g -fsanitize=address
 LIBS = -lm
 
 $(TARGET): $(OBJECTS) $(HEADERS)
