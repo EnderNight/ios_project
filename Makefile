@@ -1,5 +1,5 @@
 
-CC ?= gcc
+CC = gcc
 SRCDIR ?= src
 BUILDDIR ?= obj
 INCDIR ?= include
@@ -11,15 +11,15 @@ SOURCES ?= $(shell find $(SRCDIR) -type f -name *.c)
 OBJECTS ?= $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.c=.o))
 HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
-CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -std=c17 -g
-LIBS = -lm
+CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -g -fsanitize=address
+LIBS = 
 
-$(TARGET): $(OBJECTS) $(HEADERS)
-	$(CC) $^ -o $(TARGET) $(LIBS)
+$(TARGET): $(OBJECTS)
+	$(CC) $^ -o $(TARGET) $(LIBS) $(CFLAGS)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	@mkdir -p $(BUILDDIR)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $< -save-temps
+	$(CC) $(CFLAGS) -c -o $@ $< -save-temps
 
 clean:
 	$(RM) -r $(BUILDDIR) $(TARGET) bin
