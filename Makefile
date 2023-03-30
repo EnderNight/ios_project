@@ -3,7 +3,7 @@ CC ?= gcc
 SRCDIR ?= src
 BUILDDIR ?= obj
 INCDIR ?= include
-TARGET ?= bin/run
+TARGET ?= ios_project
 
 
 
@@ -15,7 +15,6 @@ CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -std=c17 -g -fsanitize=address
 LIBS = -lm
 
 $(TARGET): $(OBJECTS) $(HEADERS)
-	@mkdir -p bin
 	$(CC) $^ -o $(TARGET) $(LIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
