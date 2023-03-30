@@ -50,7 +50,7 @@ item open_item() {
 
 void read_string(int fd, item *it){
 
-    char* text;
+    char text[SECTION_TEXT_SIZE];
     char buf;
     int num = 0;
 
