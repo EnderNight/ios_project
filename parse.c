@@ -20,7 +20,7 @@ item open_item() {
 
     item_file = open("testdirs/inventory/gasoline.item", O_RDONLY);
 
-    while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && save_sec_text == 0) {
+    while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && save_sec_text == 0 || save_sec_text == 1) {
 
         if (buf == ']')
             save_sec_text = 2;
@@ -35,7 +35,6 @@ item open_item() {
             save_sec_text = 1;
         }
     }
-    read(item_file, &buf, 1);
 
     if (len == SECTION_TEXT_SIZE)
         printf("Error: text too long!");
@@ -59,6 +58,8 @@ void read_string(int fd, item *it){
         text[num]=buf;
         ++num;
     }
+
+    text[num] = '\0';
 
     it-> text = text;
 }
