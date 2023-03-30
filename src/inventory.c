@@ -3,23 +3,14 @@
 //
 
 
-#include <stdio.h>
-#include <stdlib.h> // For exit()
-#include "parse.h"
-#include <fcntl.h>
-#include <unistd.h>
+#include "inventory.h"
 
-#define SECTION_TEXT_SIZE 100
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#define BUF_SIZE 1024
+
 
 void inventory()
 {
-    int fd = open(filename, O_RDONLY);
+    int fd = open("tests/testdirs/inventory/items", O_RDONLY);
     if (fd == -1) {
         perror("open");
         exit(1);

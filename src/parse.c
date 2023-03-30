@@ -44,7 +44,11 @@ item open_item(void) {
 
 void read_string(int fd, item *it){
 
+<<<<<<< HEAD
     char text[TEXT_SIZE];
+=======
+    char text[SECTION_TEXT_SIZE];
+>>>>>>> 25bd16bc774e6ea490fb15c93a8680b5c85486da
     char buf;
     int num = 0;
 

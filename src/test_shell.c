@@ -72,9 +72,10 @@ int execute(int argc, char *argv[])
 {
     // print_items(get_item_list());
     
-    item it = open_item();
-    printf("%s\n", it.text);
+    //item it = open_item();
+    //printf("%s\n", it.text);
 
+    inventory();
     return 0;
 }
 
