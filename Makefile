@@ -15,6 +15,7 @@ CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -std=c17 -g -fsanitize=address
 LIBS = -lm
 
 $(TARGET): $(OBJECTS) $(HEADERS)
+	@mkdir -p bin
 	$(CC) $^ -o $(TARGET) $(LIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
@@ -22,6 +23,6 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) $(INC) -c -o $@ $< -save-temps
 
 clean:
-	$(RM) -r $(BUILDDIR) $(TARGET)
+	$(RM) -r $(BUILDDIR) $(TARGET) bin
 
 .PHONY: clean
