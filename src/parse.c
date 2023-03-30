@@ -18,7 +18,7 @@ item open_item() {
     char buf;
 
 
-    item_file = open("testdirs/inventory/gasoline.item", O_RDONLY);
+    item_file = open("tests/testdirs/inventory/gasoline.item", O_RDONLY);
 
     while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && save_sec_text == 0 || save_sec_text == 1) {
 
