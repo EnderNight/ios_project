@@ -1,13 +1,7 @@
 #include "parse.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-
-#define SECTION_TEXT_SIZE 100
 
 
-
-item open_item() {
+item open_item(void) {
 
     item it;
     char text[SECTION_TEXT_SIZE];
@@ -20,7 +14,7 @@ item open_item() {
 
     item_file = open("tests/testdirs/inventory/gasoline.item", O_RDONLY);
 
-    while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && save_sec_text == 0 || save_sec_text == 1) {
+    while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && (save_sec_text == 0 || save_sec_text == 1)) {
 
         if (buf == ']')
             save_sec_text = 2;
@@ -50,7 +44,7 @@ item open_item() {
 
 void read_string(int fd, item *it){
 
-    char* text;
+    char text[TEXT_SIZE];
     char buf;
     int num = 0;
 
