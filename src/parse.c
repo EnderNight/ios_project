@@ -1,63 +1,53 @@
 #include "parse.h"
+#include <stdlib.h>
 
+void open_item(item *it) {
 
-item open_item(void) {
+  char text[SECTION_TEXT_SIZE];
+  int item_file;
+  int save_sec_text = 0;
+  int len = 0;
 
-    item it;
-    char text[SECTION_TEXT_SIZE];
-    int item_file;
-    int save_sec_text = 0;
-    int len = 0;
+  char buf;
 
-    char buf;
+  item_file = open("tests/testdirs/inventory/gasoline.item", O_RDONLY);
 
+  while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE &&
+         (save_sec_text == 0 || save_sec_text == 1)) {
 
-    item_file = open("tests/testdirs/inventory/gasoline.item", O_RDONLY);
+    if (buf == ']')
+      save_sec_text = 2;
 
-    while (read(item_file, &buf, 1) && len < SECTION_TEXT_SIZE && (save_sec_text == 0 || save_sec_text == 1)) {
-
-        if (buf == ']')
-            save_sec_text = 2;
-
-        if (save_sec_text) {
-            text[len] = buf;
-            ++len;
-        }
-
-        if (buf == '[')
-        {
-            save_sec_text = 1;
-        }
+    if (save_sec_text) {
+      text[len] = buf;
+      ++len;
     }
 
-    if (len == SECTION_TEXT_SIZE)
-        printf("Error: text too long!");
+    if (buf == '[') {
+      save_sec_text = 1;
+    }
+  }
 
-    text[len] = '\0';
-    read_string(item_file, &it);
-    close(item_file);
+  if (len == TEXT_SIZE)
+    printf("Error: text too long!");
 
-    return it;
+  text[len] = '\0';
+  read_string(item_file, it);
+  close(item_file);
 }
 
+void read_string(int fd, item *it) {
 
+  char *text = malloc(sizeof(char) * TEXT_SIZE);
+  char buf;
+  int num = 0;
 
-void read_string(int fd, item *it){
+  while (read(fd, &buf, 1)) {
+    text[num] = buf;
+    ++num;
+  }
 
-<<<<<<< HEAD
-    char text[TEXT_SIZE];
-=======
-    char text[SECTION_TEXT_SIZE];
->>>>>>> 25bd16bc774e6ea490fb15c93a8680b5c85486da
-    char buf;
-    int num = 0;
+  text[num] = '\0';
 
-    while (read(fd, &buf, 1)){
-        text[num]=buf;
-        ++num;
-    }
-
-    text[num] = '\0';
-
-    it-> text = text;
+  it->text = text;
 }

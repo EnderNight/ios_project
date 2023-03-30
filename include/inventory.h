@@ -4,10 +4,10 @@
 
 #ifndef IOS_PROJECT_INVENTORY_H
 
-#include <stdio.h>
-#include <stdlib.h> // For exit()
 #include "parse.h"
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h> // For exit()
 #include <unistd.h>
 
 #define IOS_PROJECT_INVENTORY_H
@@ -15,4 +15,4 @@
 #define SECTION_TEXT_SIZE 100
 
 void inventory();
-#endif //IOS_PROJECT_INVENTORY_H
+#endif // IOS_PROJECT_INVENTORY_H
