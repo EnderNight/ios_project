@@ -10,7 +10,7 @@ void inventory() {
         perror("open");
         exit(1);
     }
-    //che al iñi no le van los commits, esto es una prueba para ve rsi a mi me van los commits jaja
+    
 
 
     char buf[BUF_SIZE];
