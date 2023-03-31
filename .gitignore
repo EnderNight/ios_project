@@ -6,7 +6,7 @@ build-linux/
 .idea/
 
 ios_project
-.CMakeLists.txt
+CMakeLists.txt
 
 # Prerequisites
 *.d
