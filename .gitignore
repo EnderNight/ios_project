@@ -6,6 +6,7 @@ build-linux/
 .idea/
 
 ios_project
+shell
 CMakeLists.txt
 
 # Prerequisites
@@ -66,3 +67,4 @@ compile_commands.json
 
 obj/
 .cache/
+bin/
