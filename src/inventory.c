@@ -6,7 +6,7 @@
 #include "inventory.h"
 
 void inventory() {
-    char *dir_name = "tests/testdirs/inventory"
+    char *dir_name = "tests/testdirs/inventory";
     DIR *dir;
     struct dirent *entry;
     char *ext;
@@ -17,8 +17,8 @@ void inventory() {
     }
 
     while ((entry = readdir(dir)) != NULL) {
-        if ((ext = strstr(entry->d_name, ".item")) != NULL && strlen(ext) == 4) {
-            printf("%s\n", entry->d_name);
+        if ((ext = strstr(entry->d_name, ".item")) != NULL) {
+            fprintf(stderr, "%s\n", entry->d_name);
         }
     }
 

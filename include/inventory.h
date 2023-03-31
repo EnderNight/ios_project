@@ -5,11 +5,11 @@
 #ifndef IOS_PROJECT_INVENTORY_H
 
 #include "parse.h"
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h> // For exit()
 #include <unistd.h>
 #include <string.h>
+#include <dirent.h>
 
 
 void inventory();

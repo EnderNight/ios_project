@@ -11,7 +11,7 @@
 //#include "use.c"
 #include "parse.h"
 #include "item.h"
-
+#include "inventory.h"
 
 
 #define error(a) {perror(a); exit(1);};
