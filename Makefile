@@ -20,6 +20,7 @@ $(TARGET): $(OBJECTS)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) -c -o $@ $< -save-temps
+	@mv *.i *.s obj/
 
 clean:
 	$(RM) -r $(BUILDDIR) $(TARGET) bin
