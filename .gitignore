@@ -3,6 +3,8 @@ cmake-build-debug/
 build/
 build-linux/
 
+.idea/
+
 ios_project
 .CMakeLists.txt
 

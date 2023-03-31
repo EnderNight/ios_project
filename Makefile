@@ -1,5 +1,5 @@
 
-CC = gcc
+CC ?= gcc
 SRCDIR ?= src
 BUILDDIR ?= obj
 INCDIR ?= include
@@ -11,7 +11,7 @@ SOURCES ?= $(shell find $(SRCDIR) -type f -name *.c)
 OBJECTS ?= $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.c=.o))
 HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
-CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -g -fsanitize=address
+CFLAGS += -I$(INCDIR) -Wall -Wextra -Wpedantic -g -std=c11 -fsanitize=address
 LIBS = 
 
 $(TARGET): $(OBJECTS)
