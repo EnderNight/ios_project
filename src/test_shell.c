@@ -19,6 +19,8 @@
 #define MAXLINE 200
 #define MAXARGS 20
 
+// If you are on the server, remove the argument '-fsanitize=address' inside the Makefile file!!
+
 /////////// reading commands:
 
 int read_args(int *argcp, char *args[], int max, int *eofp) {

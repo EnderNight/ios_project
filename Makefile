@@ -23,11 +23,7 @@ $(TARGET): $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 	@mkdir -p $(BUILDDIR)
-	$(CC) $(CFLAGS) -c -o $@ $< -save-temps
-
-	@if [ -f %.i ] && [ -f %.s ]; then\
-		@mv *.i *.s obj/;\
-	fi
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	$(RM) -r $(BUILDDIR) $(TARGET) bin
