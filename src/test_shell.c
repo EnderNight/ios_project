@@ -19,7 +19,8 @@
 #define MAXLINE 200
 #define MAXARGS 20
 
-// If you are on the server, remove the argument '-fsanitize=address' inside the Makefile file!!
+// If you are on the server, remove the argument '-fsanitize=address' inside the
+// Makefile file!!
 
 /////////// reading commands:
 
@@ -79,8 +80,10 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
 int execute(int argc, char *argv[]) {
 
     Item *it = create_item();
-    open_item(it);
-    printf("%s\n", it->text);
+    open_item(it, "tests/testdirs/inventory/gasoline.item");
+    printf("%s\n", it->name);
+    printf("%s\n", it->desc);
+    printf("%s\n", it->usage);
 
     free_item(it);
 

@@ -1,2 +1,8 @@
-[text]
-hi this is a text test
+[name]
+Gasoline
+
+[desc]
+A simple gasoline container
+
+[usage]
+Pour it inside a car...

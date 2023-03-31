@@ -10,8 +10,6 @@ void inventory() {
         perror("open");
         exit(1);
     }
-    
-
 
     char buf[BUF_SIZE];
     int bytes_read;

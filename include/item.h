@@ -4,7 +4,9 @@
 #include <stdlib.h>
 
 typedef struct Item {
-    char *text;
+    char *name;
+    char *desc;
+    char *usage;
 } Item;
 
 Item *create_item(void);
