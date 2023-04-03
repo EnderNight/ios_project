@@ -21,8 +21,9 @@ LIBS =
 # Targets variables
 WHERE_AM_I_TAR = where_am_i
 INVENTORY_TAR = inventory
+LS_TAR = ls
 
-EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR)
+EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR)
 
 
 
@@ -56,6 +57,13 @@ $(INVENTORY_TAR): $(INVENTORY_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
 	$(CC) $(INVENTORY_OBJ) -o bin/$(INVENTORY_TAR) $(LIBS) $(CFLAGS)
 
+
+LS_SRC = $(LS_TAR).c
+LS_OBJ = $(patsubst %, $(BUILDDIR)/%, $(LS_SRC:.c=.o))
+ 
+$(LS_TAR): $(LS_OBJ) $(MAIN_TARGET) 
+	@mkdir -p bin
+	$(CC) $(LS_OBJ) -o bin/$(LS_TAR) $(LIBS) $(CFLAGS) 
 
 ######
 
