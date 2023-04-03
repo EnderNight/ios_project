@@ -18,6 +18,10 @@ void clear_item(Item *item) {
     free(item->name);
     free(item->desc);
     free(item->usage);
+
+    item->name = malloc(sizeof(char) * TEXT_SIZE);
+    item->desc = malloc(sizeof(char) * TEXT_SIZE);
+    item->usage = malloc(sizeof(char) * TEXT_SIZE);
 }
 
 void free_item(Item *item) {

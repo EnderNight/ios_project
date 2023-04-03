@@ -111,6 +111,8 @@ int execute(int argc, char *argv[]) {
             wait(&status);
             break;
         }
+
+        free(cmd);
     }
 
     return 0;
