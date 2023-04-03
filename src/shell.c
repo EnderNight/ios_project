@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define error(a)                                                               \
@@ -14,6 +16,7 @@
     };
 #define MAXLINE 200
 #define MAXARGS 20
+#define MAXCMDLEN 100
 
 // If you are on the server, remove the argument '-fsanitize=address' inside the
 // Makefile file!!
@@ -76,8 +79,40 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
 
 int execute(int argc, char *argv[]) {
 
-    for (int i = 0; i < argc; ++i)
-        printf("%s\n", argv[i]);
+    if (argc > 0) {
+
+        pid_t child;
+        int status;
+        char *cmd;
+
+        child = fork();
+        cmd = malloc(sizeof(char) * MAXCMDLEN);
+
+        switch (child) {
+
+        case -1:
+            error("fork");
+            break;
+        case 0:
+            if (strcmp(argv[0], "inventory") == 0) {
+                cmd = "bin/inventory";
+            } else if (strcmp(argv[0], "where_am_i") == 0) {
+                cmd = "bin/where_am_i";
+            } else if (strcmp(argv[0], "ls")) {
+                cmd = "bin/ls";
+            } else {
+                fprintf(stdin, "Command not found\n : %s", argv[0]);
+                exit(1);
+            }
+
+            execlp(cmd, *argv);
+            break;
+        default:
+            wait(&status);
+            break;
+        }
+    }
+
     return 0;
 }
 
