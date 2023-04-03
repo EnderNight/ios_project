@@ -22,8 +22,9 @@ LIBS =
 WHERE_AM_I_TAR = where_am_i
 INVENTORY_TAR = inventory
 LS_TAR = ls
+CD_TAR = cd
 
-EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR)
+EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(CD_TAR)
 
 
 
@@ -64,6 +65,18 @@ LS_OBJ = $(patsubst %, $(BUILDDIR)/%, $(LS_SRC:.c=.o))
 $(LS_TAR): $(LS_OBJ) $(MAIN_TARGET) 
 	@mkdir -p bin
 	$(CC) $(LS_OBJ) -o bin/$(LS_TAR) $(LIBS) $(CFLAGS) 
+
+
+
+CD_SRC = $(CD_TAR).c
+CD_OBJ = $(patsubst %, $(BUILDDIR)/%, $(CD_SRC:.c=.o))
+
+$(CD_TAR): $(CD_OBJ) $(MAIN_TARGET)
+	@mkdir -p bin
+	$(CC) $(CD_OBJ) -o bin/$(CD_TAR) $(LIBS) $(CFLAGS)
+
+
+
 
 ######
 
