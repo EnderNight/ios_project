@@ -169,7 +169,7 @@ int main(void) {
     sleep(2);
     write(STDOUT_FILENO, "Despite feeling lost and confused, you tell yourself one thing :\n", 66);
     sleep(2);
-    write(STDOUT_FILENO, "“I have to get out of here.”\n", 34);
+    write(STDOUT_FILENO, "\n“I have to get out of here.”\n\n",36);
 
     //Execute the man page, to tell player what he can do
     //TODO
