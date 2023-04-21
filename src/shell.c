@@ -101,7 +101,7 @@ int execute(int argc, char *argv[]) {
             } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
             } else {
-                fprintf(stdin, "Command not found\n : %s", argv[0]);
+                fprintf(stdout, "Command not found\n : %s", argv[0]);
                 exit(1);
             }
 
