@@ -1,5 +1,8 @@
-[text]
+[name]
 I am a Lamp!
 
-[condition]
+[desc]
 x
+
+[usage]
+y

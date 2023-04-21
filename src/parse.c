@@ -35,11 +35,13 @@ void open_item(Item *it, char *path) {
                     section = 1;
                 else if (strcmp(text, "[usage]") == 0)
                     section = 2;
-                else
+                else {
                     fprintf(
                         stderr,
                         "Parser: Error while parsing %s, Unknown section %s\n",
                         path, text);
+                        exit(1);
+                }
 
                 for (int j = 0; j < i; ++j) {
                     text[j] = '\0';
@@ -48,6 +50,7 @@ void open_item(Item *it, char *path) {
 
                 read_string(it, item_fd, section);
             } else {
+                i = 0;
                 for (int j = 0; j < i; ++j)
                     text[j] = '\0';
             }
