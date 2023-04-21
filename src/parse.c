@@ -15,6 +15,7 @@ void open_item(Item *it, char *path) {
     char text[SECTION_TEXT_SIZE];
 
     item_fd = open(path, O_RDONLY);
+    fprintf(stderr, "%s\n", path);
 
     if (item_fd == -1) {
         fprintf(stderr, "Parser: Error when opening file %s\n", path);
