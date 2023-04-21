@@ -76,6 +76,27 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
     return 1;
 }
 
+/////////// change shell color with system calls:
+void change_color(char *color) {
+    if (strcmp(color, "red") == 0) {
+        write(0, "\033[0;31m", 7);
+    } else if (strcmp(color, "green") == 0) {
+        write(0, "\033[0;32m", 7);
+    } else if (strcmp(color, "yellow") == 0) {
+        write(0, "\033[0;33m", 7);
+    } else if (strcmp(color, "blue") == 0) {
+        write(0, "\033[0;34m", 7);
+    } else if (strcmp(color, "magenta") == 0) {
+        write(0, "\033[0;35m", 7);
+    } else if (strcmp(color, "cyan") == 0) {
+        write(0, "\033[0;36m", 7);
+    } else if (strcmp(color, "white") == 0) {
+        write(0, "\033[0;37m", 7);
+    } else {
+        fprintf(stderr, "Color not found\n");
+    }
+}
+
 ///////////////////////////////////////
 
 int execute(int argc, char *argv[]) {
@@ -130,7 +151,33 @@ int execute(int argc, char *argv[]) {
 }
 
 int main(void) {
-    char *Prompt = "myShell0> ";
+    //Clear the shell screen
+    write(0, "\033[2J", 4);
+    write(0, "\033[H", 3);
+
+    //Change the shell color
+    change_color("green");
+    write(STDOUT_FILENO, "You woke up at 13 pm and were ready to start your day.\n", 56);
+    sleep(2);
+    write(STDOUT_FILENO, "As you listen to the news you realise that you have 24 hours left before the city gets nuked.\n", 94);
+    sleep(2);
+    write(STDOUT_FILENO, "“Sure whatever” you think.\n", 32);
+    sleep(2);
+    write(STDOUT_FILENO, "You go outside and realize that there is not a single person around.\n", 69);
+    sleep(2);
+    write(STDOUT_FILENO, "By the time you fully wake up, you witness bodies, blood, and fire. Nothing like usual.\n", 88);
+    sleep(2);
+    write(STDOUT_FILENO, "Despite feeling lost and confused, you tell yourself one thing :\n", 66);
+    sleep(2);
+    write(STDOUT_FILENO, "“I have to get out of here.”\n", 34);
+
+    //Execute the man page, to tell player what he can do
+    //TODO
+
+    //Change the shell color
+    change_color("white");
+    
+    char *Prompt = "Outside> ";
     int eof = 0;
     int argc;
     char *args[MAXARGS];
