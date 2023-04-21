@@ -1,6 +1,8 @@
 #include<stdio.h> 
 #include<unistd.h>
-int main(int argc, char *argv[])
+#include "cd.h"
+
+int cd(int argc, char *argv[])
 {
     char s[100];
  

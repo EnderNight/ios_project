@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "cd.h"
 
 #define error(a)                                                               \
     {                                                                          \
@@ -100,6 +101,9 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/where_am_i";
             } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
+            } else if (strcmp(argv[0], "cd") == 0) {
+                char *test = "bin";
+                cd(2, &test);
             } else {
                 fprintf(stdout, "Command not found\n : %s", argv[0]);
                 exit(1);
