@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "cd.h"
 
 #define error(a)                                                               \
     {                                                                          \
@@ -98,10 +99,20 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/inventory";
             } else if (strcmp(argv[0], "where_am_i") == 0) {
                 cmd = "bin/where_am_i";
-            } else if (strcmp(argv[0], "ls")) {
+            } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
+            } else if (strcmp(argv[0], "cd") == 0) {
+
+                char **test = malloc(sizeof(char *) * 2);
+                test[0] = "cd";
+                test[1] = "bin";
+
+                cd(2, test);
+
+                free(test);
+                exit(0);
             } else {
-                fprintf(stdin, "Command not found\n : %s", argv[0]);
+                fprintf(stdout, "Command not found\n : %s", argv[0]);
                 exit(1);
             }
 
