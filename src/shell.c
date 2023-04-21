@@ -98,7 +98,7 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/inventory";
             } else if (strcmp(argv[0], "where_am_i") == 0) {
                 cmd = "bin/where_am_i";
-            } else if (strcmp(argv[0], "ls")) {
+            } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
             } else {
                 fprintf(stdin, "Command not found\n : %s", argv[0]);
