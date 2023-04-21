@@ -29,7 +29,7 @@ void inventory() {
             strcat(dir_name, entry->d_name);
 
             clear_item(item);
-            fprintf(stderr, "%s\n", dir_name);
+
             open_item(item, dir_name);
             strcpy(dir_name, "tests/testdirs/inventory/");
         }
