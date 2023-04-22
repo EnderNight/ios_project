@@ -166,6 +166,8 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/where_am_i";
             } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
+            } else if (strcmp(argv[0], "man") == 0) {
+                cmd = "bin/man";
             } else if (strcmp(argv[0], "cd") == 0) {
 
                 char **test = malloc(sizeof(char *) * 2);
