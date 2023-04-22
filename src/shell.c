@@ -99,6 +99,50 @@ void change_color(char *color) {
 
 ///////////////////////////////////////
 
+
+int execute(int argc, char *argv[]);
+
+// Builtin functions
+
+int sh_cd(char **args);
+
+char *builtin_str[] = {
+    "cd"
+};
+
+int (*builtin_func[]) (char **) = {
+    &sh_cd
+};
+
+int sh_num_builtins() {
+    return sizeof(builtin_str) / sizeof(char *);
+}
+
+
+
+
+int sh_cd(char **args)
+{
+    return cd(2, args);
+}
+
+int sh_execute(int argc, char *argv[])
+{
+    if (argc == 0)
+        return 1;
+
+    for (int i = 0; i < sh_num_builtins(); ++i) {
+        if (strcmp(argv[0], builtin_str[i]) == 0)
+            return (*builtin_func[i])(argv);
+    }
+
+    return execute(argc, argv);
+}
+
+
+
+
+
 int execute(int argc, char *argv[]) {
 
     if (argc > 0) {
@@ -122,9 +166,9 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/where_am_i";
             } else if (strcmp(argv[0], "ls") == 0) {
                 cmd = "bin/ls";
-            } else if (strmcmp(argv[0], "man") == 0) {
+            } else if (strcmp(argv[0], "man") == 0) {
                 cmd = "bin/man";
-            }   else if (strcmp(argv[0], "cd") == 0) {
+            } else if (strcmp(argv[0], "cd") == 0) {
 
                 char **test = malloc(sizeof(char *) * 2);
                 test[0] = "cd";
