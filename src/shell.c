@@ -201,7 +201,7 @@ int main(void) {
 
     //Change the shell color
     change_color("green");
-    write(STDOUT_FILENO, "You woke up at 13 pm and were ready to start your day.\n", 56);
+    write(STDOUT_FILENO, "You woke up at 13 pm and are ready to start your day.\n", 56);
     sleep(2);
     write(STDOUT_FILENO, "As you listen to the news you realise that you have 24 hours left before the city gets nuked.\n", 94);
     sleep(2);
@@ -229,7 +229,7 @@ int main(void) {
     while (1) {
         write(0, Prompt, strlen(Prompt));
         if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
-            execute(argc, args);
+            sh_execute(argc, args);
         }
         if (eof)
             exit(0);
