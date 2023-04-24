@@ -6,8 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
-
 /*
  * Print @text to the corresponding file descriptor.
  *

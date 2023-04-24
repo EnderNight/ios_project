@@ -1,8 +1,10 @@
 #include "help.h"
+
 #include <fcntl.h> //for using open and read system calls for files
 #include <stdio.h>
 #include <stdlib.h>
-void help() {
+
+void help(void) {
 
     // fdold will save the indicator that the file has been opened
     FILE *fp;

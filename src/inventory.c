@@ -11,7 +11,6 @@
 #include <string.h>
 #include <unistd.h>
 
-
 void inventory(void) {
 
     char dir_name[100]; // variable for the directory

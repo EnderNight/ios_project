@@ -1,12 +1,11 @@
-#include "defines.h"
 #include "item.h"
+#include "defines.h"
 
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 
 Item *create_item(void) {
 
