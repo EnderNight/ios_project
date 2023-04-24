@@ -27,7 +27,10 @@ int cd(int argc, char *argv[])
 
     // printing current working directory
     printf("%s\n", getcwd(s, 100));
- 
+
+    // display the zone text files
+    // TODO
+    
     // after chdir is executed
     return 0;
 }
