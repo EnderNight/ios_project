@@ -144,7 +144,6 @@ int sh_execute(int argc, char *argv[])
 
 
 int execute(int argc, char *argv[]) {
-
     if (argc > 0) {
 
         pid_t child;
@@ -169,11 +168,11 @@ int execute(int argc, char *argv[]) {
             } else if (strcmp(argv[0], "man") == 0) {
                 cmd = "bin/man";
             } else {
-                fprintf(stdout, "Command not found\n : %s", argv[0]);
+                fprintf(stdout, "Command not found: %s\n", argv[0]);
                 exit(1);
             }
 
-            execlp(cmd, *argv);
+            execvp(cmd, argv);
             break;
         default:
             wait(&status);
