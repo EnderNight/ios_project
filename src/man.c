@@ -8,7 +8,6 @@ void readMan(char *path)
 {
     char buffer[4096];
     int length;
-
     int file = open(path, O_RDONLY);
     if (file == -1) {
         perror("Error opening file");
@@ -31,7 +30,7 @@ int main (int argc, char *argv[])
         return 1;
     }
     //We go to where all manuals are stored
-    strcat(path, "/ios_project/manuals/");
+    strcat(path, "/manuals/");
 
     //We check if the user has entered a command
     if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0)
@@ -46,15 +45,19 @@ int main (int argc, char *argv[])
     {
         case 'c':
             strcat(path, "cd.txt");
+            readMan(path);
             break;
         case 'l':
             strcat(path, "ls.txt");
+            readMan(path);
             break;
         case 'i':
             strcat(path, "inventory.txt");
+            readMan(path);
             break;
         case 'w':
             strcat(path, "whereami.txt");
+            readMan(path);
             break;
         default:
             write(STDOUT_FILENO, "What is this ?\n", strlen("What is this ?\n"));

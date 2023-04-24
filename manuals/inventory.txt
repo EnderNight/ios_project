@@ -1,0 +1,4 @@
+
+Usage: inventory
+Will list all the items you have with you
+

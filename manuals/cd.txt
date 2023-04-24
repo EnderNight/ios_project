@@ -1,0 +1,8 @@
+
+Usage: cd [OPTION]
+Use this to move around
+
+OPTIONS:
+    .., Move back
+    <Direction>, Move to this direction
+
