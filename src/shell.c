@@ -8,7 +8,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "utils.h"
 #include "cd.h"
+
 
 #define error(a)                                                               \
     {                                                                          \
@@ -57,7 +59,7 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
         break;
     case -2:
         *argcp = -1; // line too long
-        fprintf(stderr, "Line too long -- removed command\n");
+        print_err("Line too long -- removed command\n");
         return 0;
         break;
     }
@@ -168,7 +170,7 @@ int execute(int argc, char *argv[]) {
             } else if (strcmp(argv[0], "man") == 0) {
                 cmd = "bin/man";
             } else {
-                fprintf(stdout, "Command not found: %s\n", argv[0]);
+                print_err("Command not found\n");
                 exit(1);
             }
 

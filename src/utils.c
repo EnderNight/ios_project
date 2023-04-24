@@ -14,7 +14,8 @@
 * @fildes: the file descriptor that receive @text
 * @text: the text to be print out.
 *
-* Returns: EXIT
+* Returns: EXIT_SUCCESS if everything was printed out
+*          EXIT_FAILURE if there was a problem
 */
 int print_fd(int filedes, char *text) {
 
@@ -27,4 +28,34 @@ int print_fd(int filedes, char *text) {
     }
 
     return EXIT_SUCCESS;
+}
+
+
+
+/*
+* Print @text to stdout.
+*
+* @text: the text to be print out.
+*
+* Returns: EXIT_SUCCESS if everything was printed out
+*          EXIT_FAILURE if there was a problem
+*/
+int print(char *text) {
+
+    return print_fd(STDOUT_FILENO, text);
+}
+
+
+
+/*
+* Print @text to stderr.
+*
+* @text: the text to be print out.
+*
+* Returns: EXIT_SUCCESS if everything was printed out
+*          EXIT_FAILURE if there was a problem
+*/
+int print_err(char *text) {
+
+    return print_fd(STDERR_FILENO, text);
 }
