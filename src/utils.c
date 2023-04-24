@@ -1,12 +1,11 @@
 #include "utils.h"
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdarg.h>
-
 
 /*
  * Print @text to stdout.
@@ -16,7 +15,7 @@
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print_fd(int filedes, const char *fmt, va_list args) { 
+int print_fd(int filedes, const char *fmt, va_list args) {
 
     va_list args_copy;
     int text_len, res;
@@ -24,7 +23,7 @@ int print_fd(int filedes, const char *fmt, va_list args) {
 
     va_copy(args_copy, args);
 
-    text_len = vsnprintf(NULL, 0, fmt, args_copy) +1;
+    text_len = vsnprintf(NULL, 0, fmt, args_copy) + 1;
     va_end(args_copy);
     if (text_len < 0) {
         write(STDERR_FILENO, PRINT_ERR, strlen(PRINT_ERR));
@@ -35,7 +34,6 @@ int print_fd(int filedes, const char *fmt, va_list args) {
     res = vsnprintf(buf, (size_t)text_len, fmt, args);
 
     va_end(args);
-
 
     if (res < 0 || write(filedes, buf, (size_t)text_len) < (ssize_t)text_len) {
         write(STDERR_FILENO, PRINT_ERR, strlen(PRINT_ERR));
@@ -48,9 +46,6 @@ int print_fd(int filedes, const char *fmt, va_list args) {
     return EXIT_SUCCESS;
 }
 
-
-
-
 /*
  * Print @text to stdout.
  *
@@ -59,7 +54,7 @@ int print_fd(int filedes, const char *fmt, va_list args) {
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print(const char *format, ...) { 
+int print(const char *format, ...) {
 
     va_list args;
     int res;
@@ -81,7 +76,7 @@ int print(const char *format, ...) {
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print_err(const char *format, ...) { 
+int print_err(const char *format, ...) {
 
     va_list args;
     int res;
