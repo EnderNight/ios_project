@@ -7,7 +7,4 @@ void where_am_i(void) {
     printf("You are in the street: %s\n", cwd);
 }
 
-int main(void)
-{
-    where_am_i();
-}
+int main(void) { where_am_i(); }

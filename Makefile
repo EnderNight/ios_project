@@ -7,7 +7,7 @@ SRCDIR ?= src
 BUILDDIR ?= obj
 INCDIR ?= include
 BINDIR ?= bin
-MAIN_TARGET ?= shell
+MAIN_TARGET ?= main
 HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
 
@@ -24,6 +24,7 @@ INVENTORY_TAR = inventory
 LS_TAR = ls
 CD_TAR = cd
 MAN_TAR = man
+SHELL_TAR = shell
 UTILS_TAR = utils
 EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
 
@@ -33,7 +34,7 @@ EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN
 
 all: $(EXECUTABLES)
 ########## MAIN EXECUTABLE ########
-MAIN_TARGET_SRC = $(MAIN_TARGET).c $(UTILS_TAR).c $(CD_TAR).c
+MAIN_TARGET_SRC = $(MAIN_TARGET).c $(SHELL_TAR).c $(UTILS_TAR).c $(CD_TAR).c
 MAIN_TARGET_OBJ = $(patsubst %, $(BUILDDIR)/%, $(MAIN_TARGET_SRC:.c=.o))
 
 $(MAIN_TARGET): $(MAIN_TARGET_OBJ)

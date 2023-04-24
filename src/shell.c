@@ -1,31 +1,19 @@
-// test_shell
-//////////////////////////////////////////////////
-
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include "shell.h"
 #include "utils.h"
+
 #include "cd.h"
 
+// BUILTINS
 
-#define error(a)                                                               \
-    {                                                                          \
-        perror(a);                                                             \
-        exit(1);                                                               \
-    };
-#define MAXLINE 200
-#define MAXARGS 20
-#define MAXCMDLEN 100
+char *builtin_str[] = {"cd"};
 
-// If you are on the server, remove the argument '-fsanitize=address' inside the
-// Makefile file!!
+int sh_cd(int argc, char **args) { return cd(argc, args); }
 
-/////////// reading commands:
+int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
+int (*builtin_func[])(int, char **) = {&sh_cd};
+
+// Input parsing
 int read_args(int *argcp, char *args[], int max, int *eofp) {
     static char cmd[MAXLINE];
     char *cmdp;
@@ -78,73 +66,6 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
     return 1;
 }
 
-/////////// change shell color with system calls:
-void change_color(char *color) {
-    if (strcmp(color, "red") == 0) {
-        write(0, "\033[0;31m", 7);
-    } else if (strcmp(color, "green") == 0) {
-        write(0, "\033[0;32m", 7);
-    } else if (strcmp(color, "yellow") == 0) {
-        write(0, "\033[0;33m", 7);
-    } else if (strcmp(color, "blue") == 0) {
-        write(0, "\033[0;34m", 7);
-    } else if (strcmp(color, "magenta") == 0) {
-        write(0, "\033[0;35m", 7);
-    } else if (strcmp(color, "cyan") == 0) {
-        write(0, "\033[0;36m", 7);
-    } else if (strcmp(color, "white") == 0) {
-        write(0, "\033[0;37m", 7);
-    } else {
-        fprintf(stderr, "Color not found\n");
-    }
-}
-
-///////////////////////////////////////
-
-
-int execute(int argc, char *argv[]);
-
-// Builtin functions
-
-int sh_cd(int argc, char **args);
-
-char *builtin_str[] = {
-    "cd"
-};
-
-int (*builtin_func[]) (int, char **) = {
-    &sh_cd
-};
-
-int sh_num_builtins(void) {
-    return sizeof(builtin_str) / sizeof(char *);
-}
-
-
-
-
-int sh_cd(int argc, char **args)
-{
-    return cd(argc, args);
-}
-
-int sh_execute(int argc, char *argv[])
-{
-    if (argc == 0)
-        return 1;
-
-    for (int i = 0; i < sh_num_builtins(); ++i) {
-        if (strcmp(argv[0], builtin_str[i]) == 0)
-            return (*builtin_func[i])(argc, argv);
-    }
-
-    return execute(argc, argv);
-}
-
-
-
-
-
 int execute(int argc, char *argv[]) {
     if (argc > 0) {
 
@@ -187,44 +108,14 @@ int execute(int argc, char *argv[]) {
     return 0;
 }
 
-int main(void) {
-    //Clear the shell screen
-    //write(0, "\033[2J", 4);
-    //write(0, "\033[H", 3);
+int sh_execute(int argc, char *argv[]) {
+    if (argc == 0)
+        return 1;
 
-    ////Change the shell color
-    //change_color("green");
-    //write(STDOUT_FILENO, "You woke up at 13 pm and are ready to start your day.\n", 56);
-    //sleep(2);
-    //write(STDOUT_FILENO, "As you listen to the news you realise that you have 24 hours left before the city gets nuked.\n", 94);
-    //sleep(2);
-    //write(STDOUT_FILENO, "“Sure whatever” you think.\n", 32);
-    //sleep(2);
-    //write(STDOUT_FILENO, "You go outside and realize that there is not a single person around.\n", 69);
-    //sleep(2);
-    //write(STDOUT_FILENO, "By the time you fully wake up, you witness bodies, blood, and fire. Nothing like usual.\n", 88);
-    //sleep(2);
-    //write(STDOUT_FILENO, "Despite feeling lost and confused, you tell yourself one thing :\n", 66);
-    //sleep(2);
-    //write(STDOUT_FILENO, "\n“I have to get out of here.”\n\n",36);
-
-    ////Execute the man page, to tell player what he can do
-    ////TODO
-
-    ////Change the shell color
-    //change_color("white");
-    
-    char *Prompt = "Outside> ";
-    int eof = 0;
-    int argc;
-    char *args[MAXARGS];
-
-    while (1) {
-        write(0, Prompt, strlen(Prompt));
-        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
-            sh_execute(argc, args);
-        }
-        if (eof)
-            exit(0);
+    for (int i = 0; i < sh_num_builtins(); ++i) {
+        if (strcmp(argv[0], builtin_str[i]) == 0)
+            return (*builtin_func[i])(argc, argv);
     }
+
+    return execute(argc, argv);
 }

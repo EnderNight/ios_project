@@ -40,7 +40,7 @@ void open_item(Item *it, char *path) {
                         stderr,
                         "Parser: Error while parsing %s, Unknown section %s\n",
                         path, text);
-                        exit(1);
+                    exit(1);
                 }
 
                 for (int j = 0; j < i; ++j) {
