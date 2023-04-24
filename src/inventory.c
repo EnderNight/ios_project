@@ -1,6 +1,8 @@
 //
 // Created by Sergio on 24/03/2023.
 //
+#include "inventory.h"
+#include "item.h"
 
 #include <dirent.h>
 #include <libgen.h>
@@ -9,8 +11,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "inventory.h"
-#include "item.h"
 
 void inventory(void) {
 
