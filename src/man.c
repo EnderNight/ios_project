@@ -34,41 +34,14 @@ int main (int argc, char *argv[])
     strcat(path, "/ios_project/manuals/");
     if (argc == 1 || argv[1] == NULL || strlen(argv[1]) == 0)
     {
-        write(STDOUT_FILENO, "Here is what you can do:\n", 25);
-        write(STDOUT_FILENO, "\tcd\n\tls\n\tinventory\n\twhereami\n\n", 32);
+        write(STDOUT_FILENO, "Here is what you can do:\n", strlen("Here is what you can do:\n"));
+        write(STDOUT_FILENO, "\tcd\n\tls\n\tinventory\n\twhereami\n\n", strlen("\tcd\n\tls\n\tinventory\n\twhereami\n"));
         return 0;
     }
-
-    // Find the last word in the input string
-    char *lastSpace = strrchr(argv[1], ' ');
-    char *lastWord = lastSpace == NULL ? argv[1] : lastSpace + 1;
-
-    // Get the last character of the last word
-    char lastChar = lastWord[strlen(lastWord) - 1];
-
-    switch (lastChar)
-    {
-        case 'd':
-            strcat(path, "cd.txt");
-            readMan(path);
-            break;
-        case 's':
-            strcat(path, "ls.txt");
-            readMan(path);
-            break;
-        case 'y':
-            strcat(path, "inventory.txt");
-            readMan(path);
-            break;
-        case 'i':
-            strcat(path, "whereami.txt");
-            readMan(path);
-            break;
-        default:
-            write(STDOUT_FILENO, "Here is what you can do:\n", 25);
-            write(STDOUT_FILENO, "\tcd\n\tls\n\tinventory\n\twhereami\n\n", 32);
-            return 1;
-    }
+    printf("You have this argument: %s\n", argv[0]);
+    printf("You have this argument: %s\n", argv[1]);
+    printf("You have this argument: %s\n", argv[2]);
+    printf("%d\n", argc);
 
     return 0;
 }
