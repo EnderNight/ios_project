@@ -30,18 +30,36 @@ int main (int argc, char *argv[])
         perror("Error getting current directory");
         return 1;
     }
-
+    //We go to where all manuals are stored
     strcat(path, "/ios_project/manuals/");
-    if (argc == 1 || argv[1] == NULL || strlen(argv[1]) == 0)
+
+    //We check if the user has entered a command
+    if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0)
     {
         write(STDOUT_FILENO, "Here is what you can do:\n", strlen("Here is what you can do:\n"));
         write(STDOUT_FILENO, "\tcd\n\tls\n\tinventory\n\twhereami\n\n", strlen("\tcd\n\tls\n\tinventory\n\twhereami\n"));
         return 0;
     }
-    printf("You have this argument: %s\n", argv[0]);
-    printf("You have this argument: %s\n", argv[1]);
-    printf("You have this argument: %s\n", argv[2]);
-    printf("%d\n", argc);
 
-    return 0;
+    //We match the command with the manual
+    switch (argv[1][0])
+    {
+        case 'c':
+            strcat(path, "cd.txt");
+            break;
+        case 'l':
+            strcat(path, "ls.txt");
+            break;
+        case 'i':
+            strcat(path, "inventory.txt");
+            break;
+        case 'w':
+            strcat(path, "whereami.txt");
+            break;
+        default:
+            write(STDOUT_FILENO, "What is this ?\n", strlen("What is this ?\n"));
+            return 0;
+    }
+    
+
 }
