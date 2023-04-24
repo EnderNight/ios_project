@@ -1,5 +1,6 @@
 #include "item.h"
 #include "defines.h"
+#include "utils.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -59,10 +60,9 @@ void load_item(Item *it, char *path) {
     char text[SECTION_TEXT_SIZE];
 
     item_fd = open(path, O_RDONLY);
-    fprintf(stderr, "%s\n", path);
 
     if (item_fd == -1) {
-        fprintf(stderr, "Parser: Error when opening file %s\n", path);
+        print_err("Parser: Error when opening file %s\n", path);
     }
 
     while (read(item_fd, text + i, 1)) {
@@ -80,8 +80,7 @@ void load_item(Item *it, char *path) {
                 else if (strcmp(text, "[usage]") == 0)
                     section = 2;
                 else {
-                    fprintf(
-                        stderr,
+                    print_err(
                         "Parser: Error while parsing %s, Unknown section %s\n",
                         path, text);
                     exit(1);

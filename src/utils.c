@@ -5,48 +5,95 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdarg.h>
+
 
 /*
- * Print @text to the corresponding file descriptor.
+ * Print @text to stdout.
  *
- * @fildes: the file descriptor that receive @text
- * @text: the text to be print out.
+ * @format: the text to be print out, in printf like format.
  *
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print_fd(int filedes, char *text) {
+int print_fd(int filedes, const char *fmt, va_list args) { 
 
-    ssize_t text_len = (ssize_t)strlen(text);
+    va_list args_copy;
+    int text_len, res;
+    char *buf;
 
-    if (write(filedes, text, (size_t)text_len) < text_len) {
+    va_copy(args_copy, args);
+
+    text_len = vsnprintf(NULL, 0, fmt, args_copy) +1;
+    va_end(args_copy);
+    if (text_len < 0) {
+        write(STDERR_FILENO, PRINT_ERR, strlen(PRINT_ERR));
+
+        return EXIT_FAILURE;
+    }
+    buf = malloc(sizeof(char) * (size_t)text_len);
+    res = vsnprintf(buf, (size_t)text_len, fmt, args);
+
+    va_end(args);
+
+
+    if (res < 0 || write(filedes, buf, (size_t)text_len) < (ssize_t)text_len) {
         write(STDERR_FILENO, PRINT_ERR, strlen(PRINT_ERR));
 
         return EXIT_FAILURE;
     }
 
+    free(buf);
+
     return EXIT_SUCCESS;
 }
+
+
+
 
 /*
  * Print @text to stdout.
  *
- * @text: the text to be print out.
+ * @format: the text to be print out, in printf like format.
  *
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print(char *text) { return print_fd(STDOUT_FILENO, text); }
+int print(const char *format, ...) { 
+
+    va_list args;
+    int res;
+
+    va_start(args, format);
+
+    res = print_fd(STDOUT_FILENO, format, args);
+
+    va_end(args);
+
+    return res;
+}
 
 /*
  * Print @text to stderr.
  *
- * @text: the text to be print out.
+ * @format: the text to be print out, in printf like format.
  *
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
  */
-int print_err(char *text) { return print_fd(STDERR_FILENO, text); }
+int print_err(const char *format, ...) { 
+
+    va_list args;
+    int res;
+
+    va_start(args, format);
+
+    res = print_fd(STDERR_FILENO, format, args);
+
+    va_end(args);
+
+    return res;
+}
 
 /*
  * Change character colors
