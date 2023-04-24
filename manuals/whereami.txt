@@ -1,0 +1,4 @@
+
+Usage: whereami
+Where you are at the moment
+

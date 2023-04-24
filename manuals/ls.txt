@@ -1,0 +1,4 @@
+
+Usage: ls //CHANGE TO SCENARIO COMMAND NAME
+Will list all the directions you can take
+
