@@ -2,13 +2,17 @@
 // Created by Sergio on 24/03/2023.
 //
 
-#include "inventory.h"
-#include "item.h"
-#include "parse.h"
 #include <dirent.h>
 #include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h> // For exit()
+#include <string.h>
+#include <unistd.h>
 
-void inventory() {
+#include "inventory.h"
+#include "item.h"
+
+void inventory(void) {
 
     char dir_name[100]; // variable for the directory
     strcpy(dir_name,
@@ -33,7 +37,7 @@ void inventory() {
             free_item(item);
             item = create_item();
 
-            open_item(item, dir_name);
+            load_item(item, dir_name);
             strcpy(dir_name, "tests/testdirs/inventory/");
         }
     }

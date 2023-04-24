@@ -5,12 +5,5 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
-#include "parse.h"
-#include <dirent.h>
-#include <stdio.h>
-#include <stdlib.h> // For exit()
-#include <string.h>
-#include <unistd.h>
-
-void inventory();
+void inventory(void);
 #endif // INVENTORY_H

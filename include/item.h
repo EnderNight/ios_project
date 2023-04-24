@@ -1,8 +1,6 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include <stdlib.h>
-
 typedef struct Item {
     char *name;
     char *desc;
@@ -10,7 +8,7 @@ typedef struct Item {
 } Item;
 
 Item *create_item(void);
-void clear_item(Item *item);
+void load_item(Item *it, char *path);
 void free_item(Item *item);
 
 #endif // !ITEM_H
