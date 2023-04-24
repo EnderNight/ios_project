@@ -114,7 +114,7 @@ int (*builtin_func[]) (int, char **) = {
     &sh_cd
 };
 
-int sh_num_builtins() {
+int sh_num_builtins(void) {
     return sizeof(builtin_str) / sizeof(char *);
 }
 
@@ -168,16 +168,6 @@ int execute(int argc, char *argv[]) {
                 cmd = "bin/ls";
             } else if (strcmp(argv[0], "man") == 0) {
                 cmd = "bin/man";
-            } else if (strcmp(argv[0], "cd") == 0) {
-
-                char **test = malloc(sizeof(char *) * 2);
-                test[0] = "cd";
-                test[1] = "bin";
-
-                cd(2, test);
-
-                free(test);
-                exit(0);
             } else {
                 fprintf(stdout, "Command not found\n : %s", argv[0]);
                 exit(1);
