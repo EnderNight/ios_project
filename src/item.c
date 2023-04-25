@@ -131,6 +131,14 @@ int parse_title(int fd) {
     return section;
 }
 
+/*
+ * Load '.item' file at path to an Item
+ *
+ * @path: '.item' file path
+ *
+ * return: - NULL in case of a parsing error
+ *         - Item* with loaded text
+ */
 Item *load_item(char *path) {
 
     int item_fd, section = 0;
@@ -141,7 +149,7 @@ Item *load_item(char *path) {
     item_fd = open(path, O_RDONLY);
 
     if (item_fd == -1)
-        print_err("Parser: Error when opening file %s\n", path);
+        print_err("Item parser: Error when opening file %s\n", path);
 
     while (section >= 0 && read(item_fd, &buf, sizeof(char))) {
 
