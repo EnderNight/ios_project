@@ -3,7 +3,6 @@
 //
 #include "inventory.h"
 #include "item.h"
-#include "utils.h"
 
 #include <dirent.h>
 #include <libgen.h>
@@ -21,7 +20,6 @@ void inventory(void) {
     struct dirent *entry;                // idk
     Item *item;
     char *ext; // idk
-    item = create_item();
 
     if ((dir = opendir(dir_name)) == NULL) {
         perror("opendir error");
@@ -34,19 +32,17 @@ void inventory(void) {
 
             strcat(dir_name, entry->d_name);
 
-            free_item(item);
-            item = create_item();
-
-            load_item(item, dir_name);
+            item = load_item(dir_name);
 
             printf("Name: %s\n", item->name);
             printf("Desc: %s\n", item->desc);
             printf("Usage: %s\n", item->usage);
             strcpy(dir_name, "tests/testdirs/inventory/");
+
+            free_item(item);
         }
     }
     closedir(dir);
-    free_item(item);
 }
 
 int main(void) {
