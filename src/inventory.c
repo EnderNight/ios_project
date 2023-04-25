@@ -3,6 +3,7 @@
 //
 #include "inventory.h"
 #include "item.h"
+#include "utils.h"
 
 #include <dirent.h>
 #include <libgen.h>
@@ -34,12 +35,13 @@ void inventory(void) {
 
             item = load_item(dir_name);
 
-            printf("Name: %s\n", item->name);
-            printf("Desc: %s\n", item->desc);
-            printf("Usage: %s\n", item->usage);
+            if (item != NULL) {
+                print("Name: %s\n", item->name);
+                print("Desc: %s\n", item->desc);
+                print("Usage: %s\n", item->usage);
+                free_item(item);
+            }
             strcpy(dir_name, "tests/testdirs/inventory/");
-
-            free_item(item);
         }
     }
     closedir(dir);

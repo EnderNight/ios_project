@@ -57,7 +57,7 @@ void load_section_text(Item *it, int fd, int section) {
         break;
     }
 
-    while (end >= 0 && read(fd, text + i, 1) && i < TEXT_SIZE) {
+    while (end >= 0 && i < TEXT_SIZE && read(fd, text + i, 1)) {
 
         if (text[i] == '\n') {
             if (end) {
@@ -82,24 +82,24 @@ void load_section_text(Item *it, int fd, int section) {
 // TODO: use errno
 int parse_title(int fd) {
 
-    int section = -3, i = 0, j, num_t = num_titles();
+    int section = -2, i = 0, j, num_t = num_titles();
     char buf[SECTION_TITLE_SIZE];
     ssize_t ret;
 
-    while (section == -3 && (ret = read(fd, buf + i, sizeof(char))) &&
-           i < SECTION_TITLE_SIZE) {
+    while (section == -2 && i < SECTION_TITLE_SIZE &&
+           (ret = read(fd, buf + i, sizeof(char)))) {
 
         if (buf[i] == ']') {
             j = 0;
             buf[i] = '\0';
-            while (j < num_t && section == -3) {
+            while (j < num_t && section == -2) {
                 if (strcmp(buf, section_titles[j]) == 0) {
                     section = j;
                 }
                 ++j;
             }
 
-            if (section == -3) {
+            if (section == -2) {
                 print_err(
                     "Item parser error: Unrecognized section title '%s'.\n",
                     buf);
@@ -119,9 +119,10 @@ int parse_title(int fd) {
                   SECTION_TITLE_SIZE);
         section = -1;
     } else if (ret == 0) {
-        section = -2;
+        print_err(
+            "Item parser error: incomplete title (missing ']' bracket).\n");
+        section = -1;
     }
-
 
     if (ret > 0) {
         read(fd, buf, sizeof(char));
@@ -130,24 +131,28 @@ int parse_title(int fd) {
     return section;
 }
 
-Item* load_item(char *path) {
+Item *load_item(char *path) {
 
-    int item_fd, section;
+    int item_fd, section = 0;
     char buf;
-    Item *it = create_item();
+    Item *it;
 
+    it = create_item();
     item_fd = open(path, O_RDONLY);
 
     if (item_fd == -1)
         print_err("Parser: Error when opening file %s\n", path);
 
-    while (read(item_fd, &buf, sizeof(char))) {
+    while (section >= 0 && read(item_fd, &buf, sizeof(char))) {
 
         if (buf == '[') {
             section = parse_title(item_fd);
 
             if (section > -1) {
                 load_section_text(it, item_fd, section);
+            } else {
+                free_item(it);
+                it = NULL;
             }
         }
     }

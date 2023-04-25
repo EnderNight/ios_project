@@ -7,7 +7,7 @@ typedef struct Item {
     char *usage;
 } Item;
 
-Item* load_item(char *path);
+Item *load_item(char *path);
 void free_item(Item *item);
 
 #endif // !ITEM_H
