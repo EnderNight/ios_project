@@ -19,7 +19,7 @@
  * of other #include directives (for the compiler to verify the header)
  */
 
-#define SECTION_TEXT_SIZE 20
+#define SECTION_TITLE_SIZE 20
 #define TEXT_SIZE 200
 
 #endif // !DEFINES_H

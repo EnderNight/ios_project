@@ -8,6 +8,10 @@
 #include <string.h>
 #include <unistd.h>
 
+char *section_titles[] = {"[name]", "[desc]", "[usage]"};
+
+int num_titles(void) { return sizeof(section_titles) / sizeof(char *); }
+
 Item *create_item(void) {
 
     Item *new_item = malloc(sizeof(Item));
@@ -26,7 +30,15 @@ void free_item(Item *item) {
     free(item);
 }
 
-void read_string(Item *it, int fd, int section) {
+/*
+ * Load the corresponding text from fd inside it.
+ *
+ * @it: Item in which text is loaded
+ * @fd: file descriptor of the .item file
+ * @section: The section number where to save the text
+ *
+ */
+void load_section_text(Item *it, int fd, int section) {
 
     int i = 0;
     char *text;
@@ -45,60 +57,77 @@ void read_string(Item *it, int fd, int section) {
         break;
     }
 
-    while (read(fd, text + i, 1)) {
-
-        if (text[i] == '\n')
-            break;
+    while (read(fd, text + i, 1) && text[i] != '\n') {
         ++i;
     }
     text[i] = '\0';
 }
 
+// TODO: use errno
+int parse_title(int fd) {
+
+    int section = -3, i = 0, j, num_t = num_titles();
+    char buf[SECTION_TITLE_SIZE];
+    ssize_t ret;
+
+    while ((ret = read(fd, buf + i, sizeof(char))) && section == -3 &&
+           i < SECTION_TITLE_SIZE) {
+
+        if (buf[i] == '\n') {
+            i = 0;
+        } else if (i > 0 && buf[i] == ']') {
+
+            j = 0;
+            buf[i + 1] = '\0';
+            while (j < num_t && section == -3) {
+                if (strcmp(buf, section_titles[j]) == 0) {
+                    section = j;
+                }
+                ++j;
+            }
+
+            if (section == -3) {
+                print_err(
+                    "Item parser error: Unrecognized section title '%s'.\n",
+                    buf);
+                section = -1;
+            }
+
+        } else {
+            ++i;
+        }
+    }
+
+    if (ret == -1) {
+        print_err("Item parser error: error while reading file.\n");
+        section = -1;
+    } else if (i >= SECTION_TITLE_SIZE) {
+        print_err("Item parser error: Section title must be shorter than "
+                  "SECTION_TITLE_SIZE: %d\n",
+                  SECTION_TITLE_SIZE);
+        section = -1;
+    } else if (ret == 0) {
+        section = -2;
+    }
+
+    if (section > -1) {
+        lseek(fd, sizeof(char), SEEK_CUR);
+    }
+
+    return section;
+}
+
 void load_item(Item *it, char *path) {
 
-    int item_fd, i = 0, section;
-    char text[SECTION_TEXT_SIZE];
+    int item_fd, ret;
 
     item_fd = open(path, O_RDONLY);
 
-    if (item_fd == -1) {
+    if (item_fd == -1)
         print_err("Parser: Error when opening file %s\n", path);
-    }
 
-    while (read(item_fd, text + i, 1)) {
-
-        if (i >= SECTION_TEXT_SIZE)
-            break;
-
-        if (text[i] == '\n') {
-            if (i > 0 && text[i - 1] == ']') {
-                text[i] = '\0';
-                if (strcmp(text, "[name]") == 0)
-                    section = 0;
-                else if (strcmp(text, "[desc]") == 0)
-                    section = 1;
-                else if (strcmp(text, "[usage]") == 0)
-                    section = 2;
-                else {
-                    print_err(
-                        "Parser: Error while parsing %s, Unknown section %s\n",
-                        path, text);
-                    exit(1);
-                }
-
-                for (int j = 0; j < i; ++j) {
-                    text[j] = '\0';
-                }
-                i = 0;
-
-                read_string(it, item_fd, section);
-            } else {
-                i = 0;
-                for (int j = 0; j < i; ++j)
-                    text[j] = '\0';
-            }
-        } else
-            ++i;
+    while ((ret = parse_title(item_fd)) >= 0) {
+        load_section_text(it, item_fd, ret);
     }
 
     close(item_fd);
