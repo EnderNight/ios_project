@@ -13,7 +13,7 @@ HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
 # Compiler variables
 CC ?= gcc
-CFLAGS += -I$(INCDIR) -Wall -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wformat-overflow -Wformat-truncation -Wundef -Wconversion -Wpedantic -g3 -fsanitize=address
+CFLAGS += -I$(INCDIR) -Wall -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wformat-overflow -Wformat-truncation -Wundef -Wconversion -Wpedantic -g3 -fsanitize=address -std=gnu11
 LIBS = 
 
 
