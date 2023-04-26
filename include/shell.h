@@ -16,13 +16,13 @@ typedef struct Variable {
 } Variable;
 
 typedef struct ENV {
-    Variable *env;
+    Variable **list;
+    int size;
     int num;
 } ENV;
 
 typedef struct Shell {
     ENV *env;
-    char *prompt;
 } Shell;
 
 

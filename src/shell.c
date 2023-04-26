@@ -14,37 +14,92 @@
 
 #define PROMPT "Outside> "
 #define BINDIR "bin"
+#define VAR_NAME_MAX_LENGTH 20
+#define VAR_VALUE_MAX_LENGTH 100
 
 // Utils
 
+void free_variable(Variable *var) {
+
+    free(var->name);
+    free(var->value);
+
+    free(var);
+}
+
+
+
+void free_env(ENV *env) {
+
+    for (int i = 0; i < env->num; ++i) {
+        free_variable(env->list[i]);
+    }
+
+    free(env->list);
+    free(env);
+}
+
 void free_shell(Shell *shell) {
 
+    free_env(shell->env);
+
     free(shell);
-
 }
 
 
-void export(Shell *shell, char *name, char *value) {
 
+Variable* create_variable(char *name, char *value) {
+
+    Variable *var; 
+
+    if (strlen(name) > VAR_NAME_MAX_LENGTH || strlen(value) > VAR_VALUE_MAX_LENGTH) {
+        var = NULL;
+    } else {
+
+        var = malloc(sizeof(Variable));
+
+        var->name = malloc(sizeof(char) * VAR_NAME_MAX_LENGTH +1);
+        var->value = malloc(sizeof(char) * VAR_VALUE_MAX_LENGTH +1);
+
+        strcpy(var->name, name);
+        strcpy(var->value, value);
+    }
     
-
-
+    return var;
 
 }
 
 
 
-void init_env(Shell *shell) {
+int init_env(Shell *shell) {
 
     // Get absolute path of bin/ dir 
     char *bin_path;
-
     bin_path = realpath(BINDIR, NULL);
 
+    if (bin_path == NULL) {
+        perror("Init env");
+        return -1;
+    }
 
+    // Init env
+    shell->env = malloc(sizeof(ENV));
+    shell->env->list = malloc(sizeof(Variable *) * 4);
 
-    
+    shell->env->num = 2;
+    shell->env->size = 4;
 
+    // Init path
+    Variable *path = create_variable("PATH", bin_path);
+    shell->env->list[0] = path;
+
+    // Init prompt
+    Variable *prompt = create_variable("PROMPT", PROMPT);
+    shell->env->list[1] = prompt;
+
+    free(bin_path);
+
+    return 0;
 }
 
 
@@ -53,11 +108,13 @@ void init_env(Shell *shell) {
 Shell* sh_init(void) {
 
     Shell *shell = malloc(sizeof(Shell));
+    int ret;
 
-    init_env(shell);
+    ret = init_env(shell);
 
-    shell->env = NULL;
-    shell->prompt = PROMPT;
+    if (ret < 0) {
+        return NULL;
+    }
 
     return shell;
 }
@@ -207,9 +264,14 @@ int sh_loop(Shell *shell) {
     int active = 1;
 
     while (active) {
-        write(0, shell->prompt, strlen(shell->prompt));
+        print("%s", shell->env->list[1]->value);
         if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
-            sh_execute(argc, args);
+            if (strcmp(args[0], "exit") == 0) {
+                free_shell(shell);
+                active = 0;
+            } else {
+                sh_execute(argc, args);
+            }
         }
         if (eof)
             active = 0;

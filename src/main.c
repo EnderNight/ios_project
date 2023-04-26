@@ -37,10 +37,11 @@ int main(void) {
 
     shell = sh_init();
 
-    // Testing
-    // readlink("/proc/self/exe")
-    
+    if (shell == NULL) {
+        print("Error while shell bootstrap.");
+    } else {
+        sh_loop(shell);
+    }
 
-    sh_loop(shell);
     
 }
