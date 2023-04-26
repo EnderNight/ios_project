@@ -10,8 +10,24 @@
 #define MAXARGS 20
 #define MAXCMDLEN 100
 
-int sh_execute(int argc, char *argv[]);
-int execute(int argc, char *argv[]);
-int read_args(int *argcp, char *args[], int max, int *eofp);
+typedef struct Variable {
+    char *name;
+    char *value;
+} Variable;
+
+typedef struct ENV {
+    Variable *env;
+    int num;
+} ENV;
+
+typedef struct Shell {
+    ENV *env;
+    char *prompt;
+} Shell;
+
+
+
+Shell* sh_init(void);
+int sh_loop(Shell *shell);
 
 #endif // SHELL_H

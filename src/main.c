@@ -1,4 +1,5 @@
 #include "shell.h"
+#include "utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -32,17 +33,14 @@ int main(void) {
     ////Change the shell color
     // change_color("white");
 
-    char *Prompt = "Outside> ";
-    int eof = 0;
-    int argc;
-    char *args[MAXARGS];
+    Shell *shell;
 
-    while (1) {
-        write(0, Prompt, strlen(Prompt));
-        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
-            sh_execute(argc, args);
-        }
-        if (eof)
-            exit(0);
-    }
+    shell = sh_init();
+
+    // Testing
+    // readlink("/proc/self/exe")
+    
+
+    sh_loop(shell);
+    
 }

@@ -3,13 +3,74 @@
 
 #include "cd.h"
 
+#include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+
+#define PROMPT "Outside> "
+#define BINDIR "bin"
+
+// Utils
+
+void free_shell(Shell *shell) {
+
+    free(shell);
+
+}
+
+
+void export(Shell *shell, char *name, char *value) {
+
+    
+
+
+
+}
+
+
+
+void init_env(Shell *shell) {
+
+    // Get absolute path of bin/ dir 
+    char *bin_path;
+
+    bin_path = realpath(BINDIR, NULL);
+
+
+
+    
+
+}
+
+
+
+// Boot
+Shell* sh_init(void) {
+
+    Shell *shell = malloc(sizeof(Shell));
+
+    init_env(shell);
+
+    shell->env = NULL;
+    shell->prompt = PROMPT;
+
+    return shell;
+}
+
+
+
+
+
+
+
+
+
+
 
 // BUILTINS
 
@@ -20,6 +81,9 @@ int sh_cd(int argc, char **args) { return cd(argc, args); }
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int (*builtin_func[])(int, char **) = {&sh_cd};
+
+
+
 
 // Input parsing
 int read_args(int *argcp, char *args[], int max, int *eofp) {
@@ -116,6 +180,11 @@ int execute(int argc, char *argv[]) {
     return 0;
 }
 
+
+
+
+// Main loop
+
 int sh_execute(int argc, char *argv[]) {
     if (argc == 0)
         return 1;
@@ -126,4 +195,40 @@ int sh_execute(int argc, char *argv[]) {
     }
 
     return execute(argc, argv);
+}
+
+
+
+int sh_loop(Shell *shell) {
+
+    int eof = 0;
+    int argc;
+    char *args[MAXARGS];
+    int active = 1;
+
+    while (active) {
+        write(0, shell->prompt, strlen(shell->prompt));
+        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
+            sh_execute(argc, args);
+        }
+        if (eof)
+            active = 0;
+    }
+
+    return 1;
+}
+
+
+
+
+
+
+
+// Exit
+
+int sh_exit(Shell *shell) {
+
+    free_shell(shell);
+
+    return 0;
 }
