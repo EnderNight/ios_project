@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <utils.h>
+
+
 void _ls(const char *dir, int op_a, int op_l) {
     // Here we will list the directory
     struct dirent *d;
@@ -22,12 +25,12 @@ void _ls(const char *dir, int op_a, int op_l) {
         // If hidden files are found we continue
         if (!op_a && d->d_name[0] == '.')
             continue;
-        printf("%s  ", d->d_name);
+        print("%s  ", d->d_name);
         if (op_l)
-            printf("\n");
+            print("\n");
     }
     if (!op_l)
-        printf("\n");
+        print("\n");
 }
 int main(int argc, const char *argv[]) {
     if (argc == 1) {
