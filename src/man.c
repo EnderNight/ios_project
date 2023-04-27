@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     // We go to where all manuals are stored
-    strcat(path, "/manuals/");
+    strcat(path, "/data/manuals/");
 
     // We check if the user has entered a command
     if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0) {
