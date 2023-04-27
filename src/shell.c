@@ -1,16 +1,18 @@
 #include "shell.h"
+#include "defines.h"
 #include "utils.h"
 
 #include "cd.h"
 
-#include <stdlib.h>
+#include <dirent.h>
 #include <errno.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 
 #define PROMPT "Outside> "
 #define BINDIR "bin"
@@ -26,8 +28,6 @@ void free_variable(Variable *var) {
 
     free(var);
 }
-
-
 
 void free_env(ENV *env) {
 
@@ -46,34 +46,67 @@ void free_shell(Shell *shell) {
     free(shell);
 }
 
+Variable *create_variable(char *name, char *value) {
 
+    Variable *var = NULL;
 
-Variable* create_variable(char *name, char *value) {
-
-    Variable *var; 
-
-    if (strlen(name) > VAR_NAME_MAX_LENGTH || strlen(value) > VAR_VALUE_MAX_LENGTH) {
-        var = NULL;
-    } else {
-
+    if (strlen(name) <= VAR_NAME_MAX_LENGTH &&
+        strlen(value) <= VAR_VALUE_MAX_LENGTH) {
         var = malloc(sizeof(Variable));
-
-        var->name = malloc(sizeof(char) * VAR_NAME_MAX_LENGTH +1);
-        var->value = malloc(sizeof(char) * VAR_VALUE_MAX_LENGTH +1);
-
-        strcpy(var->name, name);
-        strcpy(var->value, value);
+        if (var == NULL) {
+            perror("Create variable");
+        } else {
+            var->name = malloc(sizeof(char) * VAR_NAME_MAX_LENGTH + 1);
+            if (var->name == NULL) {
+                perror("Create variable name");
+                var = NULL;
+            } else {
+                var->value = malloc(sizeof(char) * VAR_VALUE_MAX_LENGTH + 1);
+                if (var->value == NULL) {
+                    perror("Create variable value");
+                    var = NULL;
+                } else {
+                    strcpy(var->name, name);
+                    strcpy(var->value, value);
+                }
+            }
+        }
     }
-    
-    return var;
 
+    return var;
 }
 
+void export(Shell *shell, char *name, char *value) {
 
+    int ofm = 0;
+    Variable *var;
+
+    var = create_variable(name, value);
+    if (var == NULL) {
+        print_err("Export error: cannot create variable");
+    } else {
+        if (shell->env->size == shell->env->num) {
+            shell->env->size *= 2;
+            shell->env->list =
+                realloc(shell->env->list,
+                        sizeof(Variable *) * (size_t)shell->env->size);
+
+            if (shell->env->list == NULL) {
+                perror("Export error:");
+                ofm = 1;
+            }
+        }
+
+        if (!ofm) {
+            shell->env->list[shell->env->num] = var;
+            ++shell->env->num;
+        }
+    }
+}
 
 int init_env(Shell *shell) {
 
-    // Get absolute path of bin/ dir 
+    // Get absolute path of bin/ dir
     char *bin_path;
     bin_path = realpath(BINDIR, NULL);
 
@@ -84,28 +117,103 @@ int init_env(Shell *shell) {
 
     // Init env
     shell->env = malloc(sizeof(ENV));
-    shell->env->list = malloc(sizeof(Variable *) * 4);
+    if (shell->env == NULL) {
+        perror("Init env");
+    } else {
+        shell->env->list = malloc(sizeof(Variable *) * 1);
+        if (shell->env->list == NULL) {
+            perror("Init env");
+        } else {
+            shell->env->num = 0;
+            shell->env->size = 1;
 
-    shell->env->num = 2;
-    shell->env->size = 4;
+            // Init path
+            export(shell, "PATH", bin_path);
 
-    // Init path
-    Variable *path = create_variable("PATH", bin_path);
-    shell->env->list[0] = path;
+            // Init prompt
+            export(shell, "PROMPT", PROMPT);
 
-    // Init prompt
-    Variable *prompt = create_variable("PROMPT", PROMPT);
-    shell->env->list[1] = prompt;
+            free(bin_path);
 
-    free(bin_path);
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int env(Shell *shell, int argc) {
+
+    if (argc != 1) {
+        print_err("Env error: env can not take arguements");
+        return 1;
+    }
+
+    for (int i = 0; i < shell->env->num; ++i) {
+        print("%s = %s\n", shell->env->list[i]->name,
+              shell->env->list[i]->value);
+    }
 
     return 0;
 }
 
+int find_variable(char *name, Variable **list, int num) {
 
+    int i = 0;
+
+    while (i < num && strcmp(name, list[i]->name) != 0) {
+        ++i;
+    }
+
+    if (i >= num)
+        return -1;
+
+    return i;
+}
+
+char *find_command(Shell *shell, char *cmd_name) {
+
+    char *res = NULL;
+    int bin_index = find_variable("PATH", shell->env->list, shell->env->num);
+    DIR *bindir;
+    struct dirent *dent;
+
+    if (bin_index == -1) {
+        print_err("Find command error: PATH not found");
+        return NULL;
+    }
+
+    bindir = opendir(shell->env->list[bin_index]->value);
+    if (bindir == NULL) {
+        perror("Find command");
+        return NULL;
+    }
+
+    while ((dent = readdir(bindir)) != NULL &&
+           strcmp(dent->d_name, cmd_name) != 0) {
+    }
+
+    if (dent == NULL) {
+        return NULL;
+    }
+
+    res = malloc(sizeof(char) * (strlen(shell->env->list[bin_index]->value) +
+                                 strlen(cmd_name)) +
+                 2);
+    if (res == NULL) {
+        perror("Find command");
+        return NULL;
+    }
+
+    strcpy(res, shell->env->list[bin_index]->value);
+    strcat(res, "/");
+    strcat(res, cmd_name);
+
+    return res;
+}
 
 // Boot
-Shell* sh_init(void) {
+Shell *sh_init(void) {
 
     Shell *shell = malloc(sizeof(Shell));
     int ret;
@@ -119,28 +227,23 @@ Shell* sh_init(void) {
     return shell;
 }
 
-
-
-
-
-
-
-
-
-
-
 // BUILTINS
 
-char *builtin_str[] = {"cd"};
+char *builtin_str[] = {"cd", "env"};
 
-int sh_cd(int argc, char **args) { return cd(argc, args); }
+int sh_cd(Shell *shell, int argc, char **args) {
+    UNUSED(shell);
+    return cd(argc, args);
+}
+
+int sh_env(Shell *shell, int argc, char **argv) {
+    UNUSED(argv);
+    return env(shell, argc);
+}
 
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
-int (*builtin_func[])(int, char **) = {&sh_cd};
-
-
-
+int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env};
 
 // Input parsing
 int read_args(int *argcp, char *args[], int max, int *eofp) {
@@ -195,15 +298,15 @@ int read_args(int *argcp, char *args[], int max, int *eofp) {
     return 1;
 }
 
-int execute(int argc, char *argv[]) {
+int execute(Shell *shell, int argc, char *argv[]) {
+
     if (argc > 0) {
 
         pid_t child;
         int status;
-        char *cmd;
+        char *cmd = NULL;
 
         child = fork();
-        cmd = malloc(sizeof(char) * MAXCMDLEN);
 
         switch (child) {
 
@@ -211,50 +314,38 @@ int execute(int argc, char *argv[]) {
             error("fork");
             break;
         case 0:
-            if (strcmp(argv[0], "inventory") == 0) {
-                cmd = "bin/inventory";
-            } else if (strcmp(argv[0], "where_am_i") == 0) {
-                cmd = "bin/where_am_i";
-            } else if (strcmp(argv[0], "ls") == 0) {
-                cmd = "bin/ls";
-            } else if (strcmp(argv[0], "man") == 0) {
-                cmd = "bin/man";
-            } else {
+            cmd = find_command(shell, argv[0]);
+
+            if (cmd == NULL) {
                 print_err("Command not found\n");
-                exit(1);
+                break;
             }
 
             execvp(cmd, argv);
+            free(cmd);
             break;
         default:
             wait(&status);
             break;
         }
-
-        free(cmd);
     }
 
     return 0;
 }
 
-
-
-
 // Main loop
 
-int sh_execute(int argc, char *argv[]) {
+int sh_execute(Shell *shell, int argc, char *argv[]) {
     if (argc == 0)
         return 1;
 
     for (int i = 0; i < sh_num_builtins(); ++i) {
         if (strcmp(argv[0], builtin_str[i]) == 0)
-            return (*builtin_func[i])(argc, argv);
+            return (*builtin_func[i])(shell, argc, argv);
     }
 
-    return execute(argc, argv);
+    return execute(shell, argc, argv);
 }
-
-
 
 int sh_loop(Shell *shell) {
 
@@ -270,7 +361,7 @@ int sh_loop(Shell *shell) {
                 free_shell(shell);
                 active = 0;
             } else {
-                sh_execute(argc, args);
+                sh_execute(shell, argc, args);
             }
         }
         if (eof)
@@ -279,12 +370,6 @@ int sh_loop(Shell *shell) {
 
     return 1;
 }
-
-
-
-
-
-
 
 // Exit
 

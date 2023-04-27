@@ -22,4 +22,6 @@
 #define SECTION_TITLE_SIZE 20
 #define TEXT_SIZE 200
 
+#define UNUSED(x) (void)(x);
+
 #endif // !DEFINES_H
