@@ -2,33 +2,27 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <utils.h>
+
 int cd(int argc, char *argv[]) {
     char s[100];
 
-    // printing current working directory
-    printf("%s\n", getcwd(s, 100));
-
-    // look at argv[1] and see if it is a directory
+        // look at argv[1] and see if it is a directory
     // if it is a directory, then change to that directory
     // if it is not a directory, then print an error message
     // and return 1
-
+    change_color("red");
     if (argc != 2) {
-        printf("Error: cd takes one argument\n");
+        print("Where are you going ?\n");
+        change_color("white");
         return 1;
     }
 
     if (chdir(argv[1]) != 0) {
-        printf("Error: %s is not a directory or \"..\"\n", argv[1]);
+        print("This place does not exist !\n");
+        change_color("white");
         return 1;
     }
 
-    // printing current working directory
-    printf("%s\n", getcwd(s, 100));
-
-    // display the zone text files
-    // TODO
-
-    // after chdir is executed
     return 0;
 }

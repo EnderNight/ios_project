@@ -45,7 +45,7 @@ $(MAIN_TARGET): $(MAIN_TARGET_OBJ)
 
 
 ###### COMMANDS EXECUTABLES ##########
-WHERE_AM_I_SRC = $(WHERE_AM_I_TAR).c
+WHERE_AM_I_SRC = $(WHERE_AM_I_TAR).c $(UTILS_TAR).c
 WHERE_AM_I_OBJ = $(patsubst %, $(BUILDDIR)/%, $(WHERE_AM_I_SRC:.c=.o))
 
 $(WHERE_AM_I_TAR): $(WHERE_AM_I_OBJ) $(MAIN_TARGET)
@@ -63,7 +63,7 @@ $(INVENTORY_TAR): $(INVENTORY_OBJ) $(MAIN_TARGET)
 
 
 
-LS_SRC = $(LS_TAR).c
+LS_SRC = $(LS_TAR).c $(UTILS_TAR).c
 LS_OBJ = $(patsubst %, $(BUILDDIR)/%, $(LS_SRC:.c=.o))
  
 $(LS_TAR): $(LS_OBJ) $(MAIN_TARGET) 
@@ -72,7 +72,7 @@ $(LS_TAR): $(LS_OBJ) $(MAIN_TARGET)
 
 
 
-MAN_SRC = $(MAN_TAR).c
+MAN_SRC = $(MAN_TAR).c $(UTILS_TAR).c
 MAN_OBJ = $(patsubst %, $(BUILDDIR)/%, $(MAN_SRC:.c=.o))
  
 $(MAN_TAR): $(MAN_OBJ) $(MAIN_TARGET) 
