@@ -19,7 +19,7 @@ LIBS =
 
 
 # Targets variables
-WHERE_AM_I_TAR = where_am_i
+WHEREAMI_TAR = whereami
 INVENTORY_TAR = inventory
 LS_TAR = ls
 CD_TAR = cd
@@ -27,7 +27,7 @@ MAN_TAR = man
 SHELL_TAR = shell
 UTILS_TAR = utils
 ITEM_TAR = item
-EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
+EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
 
 
 
@@ -45,12 +45,12 @@ $(MAIN_TARGET): $(MAIN_TARGET_OBJ)
 
 
 ###### COMMANDS EXECUTABLES ##########
-WHERE_AM_I_SRC = $(WHERE_AM_I_TAR).c $(UTILS_TAR).c
-WHERE_AM_I_OBJ = $(patsubst %, $(BUILDDIR)/%, $(WHERE_AM_I_SRC:.c=.o))
+WHEREAMI_SRC = $(WHEREAMI_TAR).c $(UTILS_TAR).c
+WHEREAMI_OBJ = $(patsubst %, $(BUILDDIR)/%, $(WHEREAMI_SRC:.c=.o))
 
-$(WHERE_AM_I_TAR): $(WHERE_AM_I_OBJ) $(MAIN_TARGET)
+$(WHEREAMI_TAR): $(WHEREAMI_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
-	$(CC) $(WHERE_AM_I_OBJ) -o bin/$(WHERE_AM_I_TAR) $(LIBS) $(CFLAGS)
+	$(CC) $(WHEREAMI_OBJ) -o bin/$(WHEREAMI_TAR) $(LIBS) $(CFLAGS)
 
 
 

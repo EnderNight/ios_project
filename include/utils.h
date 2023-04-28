@@ -5,5 +5,5 @@
 
 int print(const char *format, ...);
 int print_err(const char *format, ...);
-
+void change_color(char * color);
 #endif // UTILS_H
