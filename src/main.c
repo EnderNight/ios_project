@@ -45,4 +45,6 @@ int main(void) {
         chdir("tests");
         sh_loop(shell);
     }
+
+    sh_end(shell);
 }

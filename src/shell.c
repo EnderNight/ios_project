@@ -157,6 +157,12 @@ int env(Shell *shell, int argc) {
     return 0;
 }
 
+int terminate(Shell *shell) {
+    shell->is_running = 0;
+
+    return 0;
+}
+
 int find_variable(char *name, Variable **list, int num) {
 
     int i = 0;
@@ -229,7 +235,7 @@ Shell *sh_init(void) {
 
 // BUILTINS
 
-char *builtin_str[] = {"cd", "env"};
+char *builtin_str[] = {"cd", "env", "exit"};
 
 int sh_cd(Shell *shell, int argc, char **args) {
     UNUSED(shell);
@@ -241,9 +247,15 @@ int sh_env(Shell *shell, int argc, char **argv) {
     return env(shell, argc);
 }
 
+int sh_exit(Shell *shell, int argc, char **argv) {
+    UNUSED(argc);
+    UNUSED(argv);
+    return terminate(shell);
+}
+
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
-int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env};
+int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit};
 
 // Input parsing
 int read_args(int *argcp, char *args[], int max, int *eofp) {
@@ -352,30 +364,22 @@ int sh_loop(Shell *shell) {
     int eof = 0;
     int argc;
     char *args[MAXARGS];
-    int active = 1;
 
-    while (active) {
+    while (shell->is_running) {
         print("%s", shell->env->list[1]->value);
-        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0) {
-            if (strcmp(args[0], "exit") == 0) {
-                free_shell(shell);
-                active = 0;
-            } else {
+        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0)
                 sh_execute(shell, argc, args);
-            }
         }
         if (eof)
-            active = 0;
-    }
+            sh_exit(shell, argc, args);
+    
 
     return 1;
 }
 
 // Exit
-
-int sh_exit(Shell *shell) {
+void sh_end(Shell *shell) {
 
     free_shell(shell);
 
-    return 0;
 }
