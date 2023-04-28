@@ -361,20 +361,31 @@ int sh_execute(Shell *shell, int argc, char *argv[]) {
 
 int sh_loop(Shell *shell) {
 
-    int eof = 0;
-    int argc;
-    char *args[MAXARGS];
-
-    while (shell->is_running) {
-        print("%s", shell->env->list[1]->value);
-        if (read_args(&argc, args, MAXARGS, &eof) && argc > 0)
-                sh_execute(shell, argc, args);
-        }
-        if (eof)
-            sh_exit(shell, argc, args);
+    // int eof = 0;
+    // int argc;
+    // char *args[MAXARGS];
+    //
+    // while (shell->is_running) {
+    //     print("%s", shell->env->list[1]->value);
+    //     if (read_args(&argc, args, MAXARGS, &eof) && argc > 0)
+    //             sh_execute(shell, argc, args);
+    //     }
+    //     if (eof)
+    //         sh_exit(shell, argc, args);
+    // 
+    //
+    // return 1;
     
+    char buf[MAXLINE];
+    int i = 0;
 
-    return 1;
+    while (read(STDIN_FILENO, buf + i, sizeof(char))) {
+        ++i;
+    }
+
+
+
+    return 0;
 }
 
 // Exit

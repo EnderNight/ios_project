@@ -4,6 +4,9 @@
 #define EOF -1
 #define INIT_POS -2
 
+char delimiters[] = { ' ', '&', '|', ';' };
+int num_delimiters = sizeof(delimiters) / sizeof(char);
+
 typedef struct input {
 
     char *buf;
@@ -14,6 +17,7 @@ typedef struct input {
 
 char next(input *in);
 char look(input *in);
+int is_delimiter(char c);
 void skip(input *in);
 
 
