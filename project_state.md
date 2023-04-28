@@ -12,7 +12,7 @@
 # Library functions
 - [x] opendir
 - [x] closedir
-- [ ] execlp
+- [x] execlp
 - [x] execvp
 
 # Process management
@@ -30,3 +30,11 @@
 
 # Project report
 - [ ] Explanation of where in the code each theoretical concept can be found
+
+# Bonuses
+- [ ] Terminal characteristics
+- [ ] Images
+- [ ] Threads
+- [ ] &
+- [ ] Logs
+- [ ] Execution time

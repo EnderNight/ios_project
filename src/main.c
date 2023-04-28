@@ -42,4 +42,6 @@ int main(void) {
     } else {
         sh_loop(shell);
     }
+
+    sh_end(shell);
 }

@@ -23,9 +23,11 @@ typedef struct ENV {
 
 typedef struct Shell {
     ENV *env;
+    int is_running;
 } Shell;
 
 Shell *sh_init(void);
 int sh_loop(Shell *shell);
+void sh_end(Shell *shell);
 
 #endif // SHELL_H
