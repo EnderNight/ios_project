@@ -43,7 +43,7 @@ int main(void) {
         //We put the player inside the right directory
         //TODO : should be something else than /test
         
-        chdir("tests");
+        chdir("story");
         change_color("white");
         sh_loop(shell);
     }

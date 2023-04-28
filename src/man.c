@@ -21,13 +21,12 @@ void readMan(char *path) {
 }
 
 int main(int argc, char *argv[]) {
-    char path[512];
-    if (getcwd(path, sizeof(path)) == NULL) {
-        perror("Error getting current directory");
-        return 1;
-    }
-    // We go to where all manuals are stored
-    strcat(path, "/data/manuals/");
+    char path [456];
+    getcwd(path,sizeof path);
+
+    char* p = strstr(path, "ios_project");
+    p[0] = 0;
+    strcat(path, "ios_project/data/manuals/");
 
     // We check if the user has entered a command
     if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0) {
@@ -42,6 +41,7 @@ int main(int argc, char *argv[]) {
     switch (argv[1][0]) {
     case 'c':
         strcat(path, "cd.txt");
+        write(STDOUT_FILENO, path, strlen(path));
         readMan(path);
         break;
     case 'l':

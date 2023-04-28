@@ -7,7 +7,7 @@
 
 int cd(int argc, char *argv[]) {
 
-        // look at argv[1] and see if it is a directory
+    // look at argv[1] and see if it is a directory
     // if it is a directory, then change to that directory
     // if it is not a directory, then print an error message
     // and return 1
@@ -19,16 +19,19 @@ int cd(int argc, char *argv[]) {
     }
     
     //See if the user wants to go back when starting
+    //He cannot, so block
     if (argv[1][0] == '.')
     {
         char cwd[456];
         getcwd(cwd, sizeof(cwd));
         char *last = strrchr(cwd, '/');
-        if(strcmp(last+1,"tests")!=0){
+        if(strcmp(last+1,"story")!=0){
             chdir("..");
             return 0;
         }else{
-            puts("I can't go back anymore!");
+            change_color("red");
+            print("I can't go back anymore!\n");
+            change_color("white");
             return 1;
         }
     }
@@ -39,6 +42,12 @@ int cd(int argc, char *argv[]) {
         change_color("white");
         return 1;
     }
+
+    //Here, the access to the directory is a success
+    //So we display the story with lseek depending on the directory
+    //Only way is to do switch case with each directory
+    //We implement it this way just to use lseek
+
 
     return 0;
 }
