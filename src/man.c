@@ -6,7 +6,7 @@
 
 void readMan(char *path) {
     char buffer[4096];
-    int length;
+    ssize_t length;
     int file = open(path, O_RDONLY);
     if (file == -1) {
         perror("Error opening file");
@@ -14,7 +14,7 @@ void readMan(char *path) {
     }
 
     while ((length = read(file, buffer, sizeof(buffer))) > 0) {
-        write(STDOUT_FILENO, buffer, length);
+        write(STDOUT_FILENO, buffer, (size_t)length);
     }
 
     close(file);
