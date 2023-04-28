@@ -40,6 +40,9 @@ int main(void) {
     if (shell == NULL) {
         print("Error while shell bootstrap.");
     } else {
+        //We put the player inside the right directory
+        //TODO : should be something else than /test
+        chdir("tests");
         sh_loop(shell);
     }
 }
