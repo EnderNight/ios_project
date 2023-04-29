@@ -10,7 +10,6 @@ void readMan(char *path) {
     int file = open(path, O_RDONLY);
     if (file == -1) {
         perror("Error opening file");
-        return;
     }
 
     while ((length = read(file, buffer, sizeof(buffer))) > 0) {
