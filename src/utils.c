@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "inventory.h"
 
 /*
  * Print @text to stdout.
@@ -93,6 +94,42 @@ int print_err(const char *format, ...) {
 /*
  * Change character colors
  */
+
+void print_text_file_in_directory(const char* directory_path) {
+    DIR* dir = opendir(directory_path);
+    struct dirent* entry;
+    char filename[256];
+    FILE* file;
+
+    if (dir == NULL) {
+        perror("Error al abrir el directorio");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            snprintf(filename, 256, "%s/%s", directory_path, entry->d_name);
+            file = fopen(filename, "r");
+            if (file != NULL) {
+                if (strstr(entry->d_name, ".txt") != NULL) {
+                    printf("Archivo encontrado: %s\n", entry->d_name);
+                    char line[256];
+                    while (fgets(line, sizeof(line), file)) {
+                        printf("%s", line);
+                    }
+                    fclose(file);
+                    closedir(dir);
+                    return;
+                }
+                fclose(file);
+            }
+        }
+    }
+
+    printf("No se encontró ningún archivo de texto en el directorio %s\n", directory_path);
+    closedir(dir);
+}
+
 void change_color(char *color) {
     if (strcmp(color, "red") == 0) {
         write(0, "\033[0;31m", 7);

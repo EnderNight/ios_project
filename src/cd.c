@@ -6,7 +6,7 @@ int cd(int argc, char *argv[]) {
     char s[100];
 
     // printing current working directory
-    printf("%s\n", getcwd(s, 100));
+    // printf("%s\n", getcwd(s, 100));
 
     // look at argv[1] and see if it is a directory
     // if it is a directory, then change to that directory
@@ -24,10 +24,10 @@ int cd(int argc, char *argv[]) {
     }
 
     // printing current working directory
-    printf("%s\n", getcwd(s, 100));
+    // printf("%s\n", getcwd(s, 100));
 
     // display the zone text files
-    // TODO
+
 
     // after chdir is executed
     return 0;

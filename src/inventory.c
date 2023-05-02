@@ -16,7 +16,7 @@ void inventory(void) {
 
     char dir_name[100]; // variable for the directory
     strcpy(dir_name,
-           "tests/testdirs/inventory/"); // directory where all .items will be
+           "game_directories/inventory/"); // directory where all .items will be
     DIR *dir;                            // idk
     struct dirent *entry;                // idk
     Item *item;
@@ -36,12 +36,13 @@ void inventory(void) {
             item = load_item(dir_name);
 
             if (item != NULL) {
-                print("Name: %s\n", item->name);
+                print("%s\n", item->name);
                 print("Desc: %s\n", item->desc);
                 print("Usage: %s\n", item->usage);
+                print("\n");
                 free_item(item);
             }
-            strcpy(dir_name, "tests/testdirs/inventory/");
+            strcpy(dir_name, "game_directories/inventory/");
         }
     }
     closedir(dir);
