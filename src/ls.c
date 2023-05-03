@@ -5,7 +5,6 @@
 
 #include <utils.h>
 
-
 void _ls(const char *dir, int op_a, int op_l) {
     // Here we will list the directory
     struct dirent *d;

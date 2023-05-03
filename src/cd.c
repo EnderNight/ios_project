@@ -7,7 +7,7 @@
 int cd(int argc, char *argv[]) {
     char s[100];
 
-        // look at argv[1] and see if it is a directory
+    // look at argv[1] and see if it is a directory
     // if it is a directory, then change to that directory
     // if it is not a directory, then print an error message
     // and return 1

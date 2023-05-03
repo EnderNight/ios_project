@@ -15,7 +15,7 @@ char next(input *in) {
 
 char look(input *in) {
 
-    if (in->pos +1 == in->size) {
+    if (in->pos + 1 == in->size) {
         return EOF;
     }
 
@@ -24,10 +24,9 @@ char look(input *in) {
     if (in->pos == INIT_POS) {
         pos = 0;
     } else {
-        pos = in->pos +1;
+        pos = in->pos + 1;
     }
     return in->buf[pos];
-
 }
 
 int is_delimiter(char c) {

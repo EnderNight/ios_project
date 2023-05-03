@@ -133,6 +133,9 @@ int init_env(Shell *shell) {
             // Init prompt
             export(shell, "PROMPT", PROMPT);
 
+            // Init mulitline prompt
+            export(shell, "MULTI_PROMPT", "> ");
+
             free(bin_path);
 
             return 0;
@@ -177,6 +180,15 @@ int find_variable(char *name, Variable **list, int num) {
     return i;
 }
 
+/*
+ * Search for a command inside PATH
+ *
+ * @shell: the current shell state
+ * @cmd_name: the string command name
+ *
+ * Return: - NULL if the command is not found or there is an error
+ *         - A pointer to the full command path
+ */
 char *find_command(Shell *shell, char *cmd_name) {
 
     char *res = NULL;
@@ -184,38 +196,33 @@ char *find_command(Shell *shell, char *cmd_name) {
     DIR *bindir;
     struct dirent *dent;
 
-    if (bin_index == -1) {
-        print_err("Find command error: PATH not found");
-        return NULL;
+    if (bin_index != -1) {
+
+        bindir = opendir(shell->env->list[bin_index]->value);
+        if (bindir != NULL) {
+
+            while ((dent = readdir(bindir)) != NULL &&
+                strcmp(dent->d_name, cmd_name) != 0) {
+            }
+
+            if (dent != NULL) {
+
+                res = malloc(sizeof(char) * (strlen(shell->env->list[bin_index]->value) +
+                             strlen(cmd_name)) +
+                             2);
+                if (res != NULL) {
+                    strcpy(res, shell->env->list[bin_index]->value);
+                    strcat(res, "/");
+                    strcat(res, cmd_name);
+
+                    return res;
+                }
+            }
+        }
     }
 
-    bindir = opendir(shell->env->list[bin_index]->value);
-    if (bindir == NULL) {
-        perror("Find command");
-        return NULL;
-    }
-
-    while ((dent = readdir(bindir)) != NULL &&
-           strcmp(dent->d_name, cmd_name) != 0) {
-    }
-
-    if (dent == NULL) {
-        return NULL;
-    }
-
-    res = malloc(sizeof(char) * (strlen(shell->env->list[bin_index]->value) +
-                                 strlen(cmd_name)) +
-                 2);
-    if (res == NULL) {
-        perror("Find command");
-        return NULL;
-    }
-
-    strcpy(res, shell->env->list[bin_index]->value);
-    strcat(res, "/");
-    strcat(res, cmd_name);
-
-    return res;
+    perror("Find command");
+    return NULL;
 }
 
 // Boot
@@ -229,6 +236,8 @@ Shell *sh_init(void) {
     if (ret < 0) {
         return NULL;
     }
+
+    shell->is_running = 1;
 
     return shell;
 }
@@ -257,57 +266,71 @@ int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit};
 
-// Input parsing
-int read_args(int *argcp, char *args[], int max, int *eofp) {
-    static char cmd[MAXLINE];
-    char *cmdp;
-    int i;
-    ssize_t ret;
+/*
+* Get the enterred command in stdin.
+* cmd must be freed after this function.
+*
+* Parameters:
+* @cmd: a string containing the command.
+*
+* Return: - NULL if there is an error, res is then equal to -1
+*         - A pointer to the command string, res is then equal to
+*               - 0 if read has reached EOF
+*               - 1 otherwise
+*/
+char *read_cmd(Shell *shell, int *res) {
 
-    *argcp = 0;
-    *eofp = 0;
-    i = 0;
-    while ((ret = read(0, cmd + i, 1)) == 1) {
-        if (cmd[i] == '\n')
-            break; // correct line
-        i++;
-        if (i >= MAXLINE) {
-            ret = -2; // line too long
-            break;
+    size_t i = 0, size = 1;
+    ssize_t ret;
+    unsigned char end = 0;
+    char *cmd = malloc(sizeof(char));
+
+    while (!end && (ret = read(STDIN_FILENO, cmd + i, sizeof(char))) == 1) {
+
+        if (cmd[i] == '\n') {
+            if (!i || cmd[i-1] != '\\') {
+                if (!i) {
+                    cmd[i] = '\0';
+                }
+                end = 1;
+            }
+            else {
+                print("%s", shell->env->list[2]->value);
+                i -= 2;
+            }
+        }
+
+        ++i;
+
+        if (i == size) {
+            size *= 2;
+            cmd = realloc(cmd, sizeof(char) * size);
+            if (cmd == NULL) {
+                perror("read_cmd realloc");
+                end = 1;
+            }
         }
     }
+
     switch (ret) {
-    case 1:
-        cmd[i + 1] = '\0'; // correct reading
-        break;
-    case 0:
-        *eofp = 1; // end of file
-        return 0;
-        break;
-    case -1:
-        *argcp = -1; // reading failure
-        fprintf(stderr, "Reading failure \n");
-        return 0;
-        break;
-    case -2:
-        *argcp = -1; // line too long
-        print_err("Line too long -- removed command\n");
-        return 0;
-        break;
-    }
-    // Analyzing the line
-    cmdp = cmd;
-    for (i = 0; i < max; i++) { /* to show every argument */
-        if ((args[i] = strtok(cmdp, " \t\n")) == (char *)NULL)
+        case 0:
+        case 1:
+            cmd[i] = '\0';
+            cmd = realloc(cmd, sizeof(char) * (i + 1));
+            if (cmd == NULL) {
+                perror("read_cmd realloc");
+            }
             break;
-        cmdp = NULL;
+
+        case -1:
+            perror("read_cmd");
+            free(cmd);
+            cmd = NULL;
+            break;
     }
-    if (i >= max) {
-        fprintf(stderr, "Too many arguments -- removed command\n");
-        return 0;
-    }
-    *argcp = i;
-    return 1;
+
+    *res = (int)ret;
+    return cmd;
 }
 
 int execute(Shell *shell, int argc, char *argv[]) {
@@ -361,36 +384,21 @@ int sh_execute(Shell *shell, int argc, char *argv[]) {
 
 int sh_loop(Shell *shell) {
 
-    // int eof = 0;
-    // int argc;
-    // char *args[MAXARGS];
-    //
-    // while (shell->is_running) {
-    //     print("%s", shell->env->list[1]->value);
-    //     if (read_args(&argc, args, MAXARGS, &eof) && argc > 0)
-    //             sh_execute(shell, argc, args);
-    //     }
-    //     if (eof)
-    //         sh_exit(shell, argc, args);
-    // 
-    //
-    // return 1;
-    
-    char buf[MAXLINE];
-    int i = 0;
+    char *command = NULL;
+    int res;
 
-    while (read(STDIN_FILENO, buf + i, sizeof(char))) {
-        ++i;
+    while (shell->is_running) {
+        print("%s", shell->env->list[1]->value);
+        if ((command = read_cmd(shell, &res)) != NULL && res) {
+            print("%s\n", command);
+            free(command);
+        }
+        if (!res)
+            sh_exit(shell, 0, NULL);
     }
-
-
 
     return 0;
 }
 
 // Exit
-void sh_end(Shell *shell) {
-
-    free_shell(shell);
-
-}
+void sh_end(Shell *shell) { free_shell(shell); }
