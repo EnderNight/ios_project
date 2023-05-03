@@ -15,9 +15,7 @@ void readScenario(char *directory) {
     char* p = strstr(path, "ios_project");
     p[0] = 0;
     strcat(path, "ios_project/data/scenario.txt");
-    
-    char buffer[4096];
-    ssize_t length;
+
     int file = open(path, O_RDONLY);
     if (file == -1)
         perror("Error opening file");
@@ -34,13 +32,16 @@ void readScenario(char *directory) {
     //Now, we read at the offset until we see an empty line
     change_color("green");
     char c;
-    int i = 0;
+    
+    //Normal read
     while (read(file, &c, 1) == 1 && c != '/') {
         putchar(c);
         fflush(stdout);
+        //If there is a newline, we wait
         if (c == '\n')
             sleep(1);
-            
+        
+
         usleep(9000);
     }
     change_color("white");
