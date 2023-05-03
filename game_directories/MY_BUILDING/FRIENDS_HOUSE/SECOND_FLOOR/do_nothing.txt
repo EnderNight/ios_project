@@ -1,0 +1,12 @@
+I can't move. I'm frozen in place, unable to process what I'm seeing.
+
+While on this state, my friend approaches me and bites me in the neck.
+
+I feel a sharp pain.
+
+What should I do now?
+
+Possible options:
+-> KILL_HIM (if possible)
+-> RUN_AWAY (LINK TO FRIENDS_HOUSE)
+

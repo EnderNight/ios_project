@@ -1,0 +1,24 @@
+
+    1. We should start implementing links to directories inside directories, for testing purposes. (idk how to do it lol)
+
+    2. We should contemplate the possibility of being able to open different .txt files/descriptions when reaching
+       the same directory from different angles (e.g. in FRIENDS_HOUSE, there is the proper .txt file and then there
+       is the one that is opened when you reach FRIENDS_HOUSE when running_away on SECOND_FLOOR)
+
+    3. For the story to not be 0 interactive, we should implement some way of decision-making on .txt files,
+       and to do so, I can think of 2 ways of implementing it:
+
+        3.1. We print at the end of a .txt file the decisions, and each of them will be a directory.
+             When entering it, a link to the proper directory will be done automatically.
+
+             e.g (in SECOND_FLOOR.txt): RUN_AWAY. We can have a directory called RUN_AWAY, that when opened will lead to the proper
+             directory, which is in this case FRIENDS_HOUSE. To implement this idea, in the ls function we can make a condition that
+             checks if the entering directory only has a link to another directory, and if so, it will automatically open it.
+
+        3.2. We leave all the possible decisions available in the same directory. For doing this, I think it will be necessary to look
+             for the .txt specifically with the name of the decision, and then open it. It might be very difficult (idk).
+
+             One thing is true, and it is that there are cases in which when we take a decision, another decision is gettable, and I think that
+             this way of implementing the concept of decision-making is better in doing so (idk, again).
+
+    4. We should create already a .h file or smt like that, to have all the global variables that are used throughout all the directories.

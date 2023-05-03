@@ -1,0 +1,19 @@
+Taking a deep breath, I decide to head upstairs to the second floor. The stairs creak beneath my feet as I ascend,
+and I can't help but feel a sense of dread at what I might find. I reach the top of the stairs and step into the hallway,
+As I move towards my friend's room, I notice that the hallway is littered with debris, broken picture frames and other
+remnants of the chaos that has consumed the world. The air is thick with the stench of decay. With trembling hands, I
+push the door open and step inside. The room is in shambles, the furniture overturned and the walls covered in blood.
+
+And then I see him - my friend, now dead, his eyes vacant and his body twisted into an unnatural position. But, as I was
+about to leave the room, I notice something strange. His body begins to twitch, and his eyes have opened. He looks at me with
+a look of pure hatred and starts moving towards me.
+
+I might not have much time to take a decision.
+
+What should I do?
+
+Possible options:
+-> DO_NOTHING
+-> KILL_HIM     (there should be a way to restrict the entrance to this directory, as the user must have taken the knife to enter here)
+-> RUN_AWAY     (LINK TO FRIENDS_HOUSE)
+
