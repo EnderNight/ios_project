@@ -18,7 +18,7 @@ void readScenario(char *directory) {
 
     int file = open(path, O_RDONLY);
     if (file == -1)
-        perror("Error opening file");
+        perror("Is the project called ios_project or ios_project-main ?");
 
 
     //We use lseek to go to the right place in the file
