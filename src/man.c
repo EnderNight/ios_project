@@ -1,3 +1,5 @@
+#include "utils.h"
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,13 +28,16 @@ int main(int argc, char *argv[]) {
     char* p = strstr(path, "ios_project");
     p[0] = 0;
     strcat(path, "ios_project/data/manuals/");
-
+    change_color("magenta");
     // We check if the user has entered a command
     if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0) {
         write(STDOUT_FILENO, "Here is what you can do:\n",
               strlen("Here is what you can do:\n"));
         write(STDOUT_FILENO, "\tcd\n\tls\n\tinventory\n\twhereami\n\n",
               strlen("\tcd\n\tls\n\tinventory\n\twhereami\n"));
+
+        change_color("white");
+
         return 0;
     }
 
@@ -40,23 +45,27 @@ int main(int argc, char *argv[]) {
     switch (argv[1][0]) {
     case 'c':
         strcat(path, "cd.txt");
-        write(STDOUT_FILENO, path, strlen(path));
         readMan(path);
+        change_color("white");
         break;
     case 'l':
         strcat(path, "ls.txt");
         readMan(path);
+        change_color("white");
         break;
     case 'i':
         strcat(path, "inventory.txt");
         readMan(path);
+        change_color("white");
         break;
     case 'w':
         strcat(path, "whereami.txt");
         readMan(path);
+        change_color("white");
         break;
     default:
         write(STDOUT_FILENO, "What is this ?\n", strlen("What is this ?\n"));
         return 0;
     }
+
 }

@@ -41,7 +41,7 @@ void inventory(void) {
                 print("Usage: %s\n", item->usage);
                 free_item(item);
             }
-            strcpy(dir_name, "tests/testdirs/inventory/");
+            strcpy(dir_name, "story/testdirs/inventory/");
         }
     }
     closedir(dir);

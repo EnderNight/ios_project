@@ -1,6 +1,7 @@
 #include "cd.h"
 #include "utils.h"
 
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,10 +9,16 @@
 #include <unistd.h>
 #include <string.h>
 
-void readScenario(char *directory) {
+void readScenario() {
+    //We get the current directory
     char path [456];
     getcwd(path,sizeof path);
 
+    //We take the directory in which the player is
+    char *directory = strdup(strrchr(path, '/'));
+    directory++;
+
+    //We get the path of the scenario file
     char* p = strstr(path, "ios_project");
     p[0] = 0;
     strcat(path, "ios_project/data/scenario.txt");
@@ -19,7 +26,6 @@ void readScenario(char *directory) {
     int file = open(path, O_RDONLY);
     if (file == -1)
         perror("Is the project called ios_project or ios_project-main ?");
-
 
     //We use lseek to go to the right place in the file
     //The offset is the number of characters in the file
@@ -71,6 +77,8 @@ int cd(int argc, char *argv[]) {
         char *last = strrchr(cwd, '/');
         if(strcmp(last+1,"start")!=0 && strcmp(last+1,"story")!=0){
             chdir("..");
+            //We display the story of the last directory
+            readScenario();
             return 0;
         }else{
             change_color("red");
@@ -80,19 +88,31 @@ int cd(int argc, char *argv[]) {
         }
     }
 
+    //Check if the player has the right to access the directory
+    //If not, print a small text
+    //The player can only access the directory if he has the right group
+    //We use the stat function to get the group id
+    struct stat fileStat;
+    //Print content of fileStat
+
+
+
     if (chdir(argv[1]) != 0) {
         change_color("red");
         print("This place does not exist !\n");
         change_color("white");
         return 0;
     }
+    
 
     //Here, the access to the directory is a success
     //So we display the story with lseek depending on the directory
     //Only way is to do switch case with each directory
     //We implement it this way just to use lseek
-    readScenario(argv[1]);
+    readScenario();
     
+
+
     return 0;
 }
 
