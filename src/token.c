@@ -1,25 +1,9 @@
-
 #include "token.h"
-#include "input.h"
 #include <stdlib.h>
 
-Token **tokenize(input *in) {
+char **remove_spaces(void) {
 
-    long list_len = 0;
-    Token **tokens = malloc(sizeof(Token *));
-    char buf;
+    char **res = malloc(sizeof(char *));
 
-    skip(in);
-
-    while (look(in) != EOF) {
-
-        buf = next(in);
-
-        if (is_delimiter(buf)) {
-
-            skip(in);
-        }
-    }
-
-    return tokens;
+    return res;
 }

@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "defines.h"
+#include "input.h"
 #include "utils.h"
 
 #include "cd.h"
@@ -202,13 +203,14 @@ char *find_command(Shell *shell, char *cmd_name) {
         if (bindir != NULL) {
 
             while ((dent = readdir(bindir)) != NULL &&
-                strcmp(dent->d_name, cmd_name) != 0) {
+                   strcmp(dent->d_name, cmd_name) != 0) {
             }
 
             if (dent != NULL) {
 
-                res = malloc(sizeof(char) * (strlen(shell->env->list[bin_index]->value) +
-                             strlen(cmd_name)) +
+                res = malloc(sizeof(char) *
+                                 (strlen(shell->env->list[bin_index]->value) +
+                                  strlen(cmd_name)) +
                              2);
                 if (res != NULL) {
                     strcpy(res, shell->env->list[bin_index]->value);
@@ -267,17 +269,17 @@ int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit};
 
 /*
-* Get the enterred command in stdin.
-* cmd must be freed after this function.
-*
-* Parameters:
-* @cmd: a string containing the command.
-*
-* Return: - NULL if there is an error, res is then equal to -1
-*         - A pointer to the command string, res is then equal to
-*               - 0 if read has reached EOF
-*               - 1 otherwise
-*/
+ * Get the enterred command in stdin.
+ * cmd must be freed after this function.
+ *
+ * Parameters:
+ * @cmd: a string containing the command.
+ *
+ * Return: - NULL if there is an error, res is then equal to -1
+ *         - A pointer to the command string, res is then equal to
+ *               - 0 if read has reached EOF
+ *               - 1 otherwise
+ */
 char *read_cmd(Shell *shell, int *res) {
 
     size_t i = 0, size = 1;
@@ -288,13 +290,12 @@ char *read_cmd(Shell *shell, int *res) {
     while (!end && (ret = read(STDIN_FILENO, cmd + i, sizeof(char))) == 1) {
 
         if (cmd[i] == '\n') {
-            if (!i || cmd[i-1] != '\\') {
+            if (!i || cmd[i - 1] != '\\') {
                 if (!i) {
                     cmd[i] = '\0';
                 }
                 end = 1;
-            }
-            else {
+            } else {
                 print("%s", shell->env->list[2]->value);
                 i -= 2;
             }
@@ -313,20 +314,20 @@ char *read_cmd(Shell *shell, int *res) {
     }
 
     switch (ret) {
-        case 0:
-        case 1:
-            cmd[i] = '\0';
-            cmd = realloc(cmd, sizeof(char) * (i + 1));
-            if (cmd == NULL) {
-                perror("read_cmd realloc");
-            }
-            break;
+    case 0:
+    case 1:
+        cmd[i] = '\0';
+        cmd = realloc(cmd, sizeof(char) * (i + 1));
+        if (cmd == NULL) {
+            perror("read_cmd realloc");
+        }
+        break;
 
-        case -1:
-            perror("read_cmd");
-            free(cmd);
-            cmd = NULL;
-            break;
+    case -1:
+        perror("read_cmd");
+        free(cmd);
+        cmd = NULL;
+        break;
     }
 
     *res = (int)ret;
@@ -390,7 +391,18 @@ int sh_loop(Shell *shell) {
     while (shell->is_running) {
         print("%s", shell->env->list[1]->value);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
-            print("%s\n", command);
+
+            print("Init command: %s", command);
+
+            Input *in = init_input(command);
+            separate(in);
+
+            print("Separated arguments\n");
+            for (int i = 0; i < in->num_string; ++i) {
+                print("Argument %d: %s\n", i, in->sep_cmd[i]);
+            }
+
+            free_input(in);
             free(command);
         }
         if (!res)

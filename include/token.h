@@ -1,16 +1,26 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "input.h"
-
 typedef struct Token {
 
-    long len;
+    enum type {
+        TOKEN_CMD = 1,
+        TOKEN_ARG,
+        TOKEN_PIPE,
+        TOKEN_REDIR,
+
+    } type;
+
     char *text;
+    int size;
 
 } Token;
 
-Token **tokenize(input *in);
-void free_token(Token *tok);
+typedef struct Tokens {
+
+    Token **token_list;
+    int size;
+
+} Tokens;
 
 #endif // TOKEN_H

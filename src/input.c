@@ -1,50 +1,50 @@
 #include "input.h"
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
-char next(input *in) {
+Input *init_input(char *command) {
 
-    if (in->pos == INIT_POS) {
-        ++in->pos;
-    }
+    Input *in = malloc(sizeof(Input));
+    size_t len = strlen(command);
 
-    if (++in->pos == in->pos) {
-        return EOF;
-    }
+    in->single_cmd = malloc(sizeof(char) * (len + 1));
+    strcpy(in->single_cmd, command);
 
-    return in->buf[in->pos];
+    in->size = len;
+
+    return in;
 }
 
-char look(input *in) {
+void free_input(Input *in) {
 
-    if (in->pos + 1 == in->size) {
-        return EOF;
-    }
+    free(in->single_cmd);
 
-    long pos;
+    // for (int i = 0; i < in->num_string; ++i) {
+    //     free(in->sep_cmd[i]);
+    // }
+    free(in->sep_cmd);
 
-    if (in->pos == INIT_POS) {
-        pos = 0;
-    } else {
-        pos = in->pos + 1;
-    }
-    return in->buf[pos];
+    free(in);
 }
 
-int is_delimiter(char c) {
+void separate(Input *in) {
 
-    int is_end = 0, i = 0;
+    size_t size = 1, i = 0;
+    char *cmdp = in->single_cmd;
 
-    while (i < num_delimiters && !is_end) {
-        if (delimiters[i] == c) {
-            is_end = 1;
+    in->sep_cmd = malloc(sizeof(char *));
+
+    while ((in->sep_cmd[i] = strtok(cmdp, " \t\n")) != NULL) {
+        ++i;
+        cmdp = NULL;
+
+        if (i == size) {
+            size *= 2;
+            in->sep_cmd = realloc(in->sep_cmd, sizeof(char *) * size);
         }
     }
 
-    return is_end;
-}
-
-void skip(input *in) {
-
-    while (is_delimiter(look(in))) {
-        next(in);
-    }
+    in->sep_cmd = realloc(in->sep_cmd, sizeof(char *) * (i + 1));
+    in->num_string = (int)i;
 }

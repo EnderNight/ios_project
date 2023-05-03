@@ -1,23 +1,17 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#define EOF -1
-#define INIT_POS -2
+#include <stddef.h>
 
-char delimiters[] = {' ', '&', '|', ';'};
-int num_delimiters = sizeof(delimiters) / sizeof(char);
+typedef struct Input {
+    char *single_cmd;
+    char **sep_cmd;
+    size_t size;
+    int num_string;
+} Input;
 
-typedef struct input {
-
-    char *buf;
-    long size;
-    long pos;
-
-} input;
-
-char next(input *in);
-char look(input *in);
-int is_delimiter(char c);
-void skip(input *in);
+Input *init_input(char *command);
+void separate(Input *in);
+void free_input(Input *in);
 
 #endif // INPUT_H
