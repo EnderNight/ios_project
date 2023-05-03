@@ -26,15 +26,22 @@ void readScenario(char *directory) {
     //We use lseek to go to the right place in the file
     //The offset is the number of characters in the file
     if (strcmp(directory, "start") == 0)
-        lseek(file, 7, SEEK_SET);
+    {
+        lseek(file, 6, SEEK_SET);
+    }
     //ADD OTHER DIRECTORIES HERE
     
     //Now, we read at the offset until we see an empty line
     change_color("green");
-    while ((length = read(file, buffer, sizeof(buffer))) > 0) {
-        print(buffer);
-        if (buffer[0] == '\n')
-            break;
+    char c;
+    int i = 0;
+    while (read(file, &c, 1) == 1 && c != '/') {
+        putchar(c);
+        fflush(stdout);
+        if (c == '\n')
+            sleep(1);
+            
+        usleep(9000);
     }
     change_color("white");
 
