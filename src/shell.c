@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "defines.h"
 #include "input.h"
+#include "token.h"
 #include "utils.h"
 
 #include "cd.h"
@@ -402,6 +403,14 @@ int sh_loop(Shell *shell) {
                 print("Argument %d: %s\n", i, in->sep_cmd[i]);
             }
 
+            print("Tokenization\n");
+            Tokens *tokens = tokenize(in);
+            for (int i = 0; i < tokens->num; ++i) {
+                print("Token %d: text: %s, type: %d\n", i,
+                      tokens->token_list[i]->text, tokens->token_list[i]->type);
+            }
+
+            free_tokens(tokens);
             free_input(in);
             free(command);
         }
