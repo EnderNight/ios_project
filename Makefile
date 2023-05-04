@@ -29,6 +29,7 @@ UTILS_TAR = utils
 ITEM_TAR = item
 INPUT_TAR = input
 TOKEN_TAR = token
+
 EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
 
 

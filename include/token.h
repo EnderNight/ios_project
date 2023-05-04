@@ -7,7 +7,6 @@
 
 typedef enum type {
     TOKEN_CMD = 1,
-    TOKEN_ARG,
     TOKEN_PIPE,
     TOKEN_REDIR,
     TOKEN_FILE,
@@ -15,8 +14,8 @@ typedef enum type {
 
 typedef struct Token {
     Type type;
-    char *text;
-    size_t size;
+    char **command;
+    size_t len;
 } Token;
 
 typedef struct Tokens {

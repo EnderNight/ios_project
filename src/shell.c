@@ -393,7 +393,7 @@ int sh_loop(Shell *shell) {
         print("%s", shell->env->list[1]->value);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
 
-            print("Init command: %s", command);
+            print("\nInit command: %s\n", command);
 
             Input *in = init_input(command);
             separate(in);
@@ -403,12 +403,19 @@ int sh_loop(Shell *shell) {
                 print("Argument %d: %s\n", i, in->sep_cmd[i]);
             }
 
-            print("Tokenization\n");
+            print("\nTokenization\n");
             Tokens *tokens = tokenize(in);
             for (int i = 0; i < tokens->num; ++i) {
-                print("Token %d: text: %s, type: %d\n", i,
-                      tokens->token_list[i]->text, tokens->token_list[i]->type);
+                print("Token %d: text: '", i);
+                for (size_t j = 0; j < tokens->token_list[i]->len - 1; ++j) {
+                    print("%s ", tokens->token_list[i]->command[j]);
+                }
+                print("%s'", tokens->token_list[i]
+                                 ->command[tokens->token_list[i]->len - 1]);
+                print(" type: %d\n", tokens->token_list[i]->type);
             }
+
+            print("\n");
 
             free_tokens(tokens);
             free_input(in);
