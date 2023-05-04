@@ -1,4 +1,6 @@
 #include "input.h"
+#include "utils.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,10 +21,6 @@ Input *init_input(char *command) {
 void free_input(Input *in) {
 
     free(in->single_cmd);
-
-    // for (int i = 0; i < in->num_string; ++i) {
-    //     free(in->sep_cmd[i]);
-    // }
     free(in->sep_cmd);
 
     free(in);
@@ -47,4 +45,12 @@ void separate(Input *in) {
 
     in->sep_cmd = realloc(in->sep_cmd, sizeof(char *) * (i + 1));
     in->num_string = (int)i;
+}
+
+void print_input(Input *in) {
+
+    print("Separated arguments\n");
+    for (int i = 0; i < in->num_string; ++i) {
+        print("Argument %d: %s\n", i, in->sep_cmd[i]);
+    }
 }

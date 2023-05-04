@@ -13,5 +13,6 @@ typedef struct Input {
 Input *init_input(char *command);
 void separate(Input *in);
 void free_input(Input *in);
+void print_input(Input *in);
 
 #endif // INPUT_H

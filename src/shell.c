@@ -398,22 +398,11 @@ int sh_loop(Shell *shell) {
             Input *in = init_input(command);
             separate(in);
 
-            print("Separated arguments\n");
-            for (int i = 0; i < in->num_string; ++i) {
-                print("Argument %d: %s\n", i, in->sep_cmd[i]);
-            }
+            print_input(in);
 
             print("\nTokenization\n");
             Tokens *tokens = tokenize(in);
-            for (int i = 0; i < tokens->num; ++i) {
-                print("Token %d: text: '", i);
-                for (size_t j = 0; j < tokens->token_list[i]->len - 1; ++j) {
-                    print("%s ", tokens->token_list[i]->command[j]);
-                }
-                print("%s'", tokens->token_list[i]
-                                 ->command[tokens->token_list[i]->len - 1]);
-                print(" type: %d\n", tokens->token_list[i]->type);
-            }
+            print_tokens(tokens);
 
             print("\n");
 

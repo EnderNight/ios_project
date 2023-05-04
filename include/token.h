@@ -6,10 +6,12 @@
 #include <stddef.h>
 
 typedef enum type {
-    TOKEN_CMD = 1,
-    TOKEN_PIPE,
+    TOKEN_FILE = 1,
+    TOKEN_CMD,
     TOKEN_REDIR,
-    TOKEN_FILE,
+    TOKEN_PIPE,
+    TOKEN_AMPER,
+    TOKEN_SEMI,
 } Type;
 
 typedef struct Token {
@@ -26,6 +28,8 @@ typedef struct Tokens {
 } Tokens;
 
 Tokens *tokenize(Input *in);
+void print_tokens(Tokens *tokens);
+void print_token(Token *token);
 void free_token(Token *token);
 void free_tokens(Tokens *token);
 

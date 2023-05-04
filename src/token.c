@@ -1,5 +1,6 @@
 #include "token.h"
 #include "input.h"
+#include "utils.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -75,6 +76,10 @@ Tokens *tokenize(Input *in) {
         } else if (strcmp(in->sep_cmd[i], ">") == 0) {
             add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_REDIR, in);
             is_redir = 1;
+        } else if (strcmp(in->sep_cmd[i], "&") == 0) {
+            add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_AMPER, in);
+        } else if (strcmp(in->sep_cmd[i], ";") == 0) {
+            add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_SEMI, in);
         }
 
         ++i;
@@ -89,4 +94,26 @@ Tokens *tokenize(Input *in) {
     tokens->num = tok_index;
 
     return tokens;
+}
+
+void print_token(Token *token) {
+
+    print("Token: '");
+    for (size_t i = 0; i < token->len - 1; ++i) {
+        print("%s ", token->command[i]);
+    }
+    print("%s', type: %d\n", token->command[token->len - 1], token->type);
+}
+
+void print_tokens(Tokens *tokens) {
+
+    for (int j = 0; j < tokens->num; ++j) {
+        print("Token %d: '", j);
+        for (size_t i = 0; i < tokens->token_list[j]->len - 1; ++i) {
+            print("%s ", tokens->token_list[j]->command[i]);
+        }
+        print("%s', type: %d\n",
+              tokens->token_list[j]->command[tokens->token_list[j]->len - 1],
+              tokens->token_list[j]->type);
+    }
 }
