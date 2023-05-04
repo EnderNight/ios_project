@@ -6,7 +6,58 @@ By the time you fully wake up, you witness bodies, blood, and fire. Nothing like
 Despite feeling lost and confused, you tell yourself one thing :
 “I have to get out of here”
 /
-LEVEL 1
-This is the next level :)
+roundabout
+I approach the edges of the city. I see a barricade made by cars, that is apparently blocking the way out of the city.
+The police looks to have the situation under control here, but the ambience is still tense. I can see a few people in
+the crowd that are armed with guns, and I can see a few police officers with their guns drawn as well.
+
+I might be able to get through the barricade, but I think I should try to find another way out of the city first, or
+at least, try to get something to convince the police to let me through.
+
+I can go back to my building or keep going forward to the end of the street. I reckon there was a mall at the end
+of the street.
+/
+friendhouse
+I set out from my home towards my friend's house.
+
+The streets are eerily quiet. I move quickly, keeping to the shadows and trying to avoid drawing attention to myself.
+As I move through the abandoned streets,
+I can't help but feel a sense of sadness at the state of the world around me. Buildings that were once bustling
+with life now lie in ruins, their windows shattered and their walls crumbling. The world around me is so different
+now, so much more dangerous than it once was. I grip myself, ready to defend myself against any threat that may come my way.
+
+As I approach my friend's house, I can see that it has not escaped the destruction. The front door is hanging
+off its hinges, and the windows are smashed. I enter the house, and call out to my friend. There is no response.
+
+I could either investigate the first floor, or head upstairs to the second floor.
+/
+bedroom
+Taking a deep breath, I decide to head upstairs to the second floor. The stairs creak beneath my feet as I ascend,
+and I can't help but feel a sense of dread at what I might find. I reach the top of the stairs and step into the hallway,
+As I move towards my friend's room, I notice that the hallway is littered with debris, broken picture frames and other
+remnants of the chaos that has consumed the world. The air is thick with the stench of decay. With trembling hands, I
+push the door open and step inside. The room is in shambles, the furniture overturned and the walls covered in blood.
+
+And then I see him - my friend, now dead, his eyes vacant and his body twisted into an unnatural position. But, as I was
+about to leave the room, I notice something strange. His body begins to twitch, and his eyes have opened. He looks at me with
+a look of pure hatred and starts moving towards me.
 %
-Are you ready for it ? 
+I might not have much time to take a decision.
+What should I do?
+/
+do_nothing
+I can't move. I'm frozen in place, unable to process what I'm seeing.
+
+While on this state, my friend approaches me and bites me in the neck.
+
+I feel a sharp pain.
+/
+My heart races as I realize what I have to do. I raise my weapon, my hand shaking with fear and grief, and take a step
+towards the being that was once my friend. I hesitate for a moment, but I remember that there is no turning back now.
+I close my eyes and swing the knife with all my might, the sound of metal hitting flesh echoing through the room.
+
+I open my eyes and see that he is still standing, but it's not moving anymore. It's just standing there, staring
+at me with his vacant eyes. I feel sick to my stomach and drop the knife, which clatters to the floor. I turn around and
+run out of the room, with tears streaming down my face. I know there was no other choice, but it still hurts so much.
+
+There is noting else worth doing here.

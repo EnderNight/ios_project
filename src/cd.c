@@ -29,14 +29,22 @@ void readScenario() {
 
     //We use lseek to go to the right place in the file
     //The offset is the number of characters in the file
+    //In order to get the offset, we execute this command on a terminal :
+    //grep -b -o 'Directory' scenario.txt | awk '{print $1+length("Directory") + 1}'
+    //We get the number of bytes before the word
     if (strcmp(directory, "start") == 0)
     {
         lseek(file, 6, SEEK_SET);
     }
-    if (strcmp(directory, "test") == 0)
+    if (strcmp(directory, "roundabout") == 0)
     {
-        lseek(file, 450, SEEK_SET);
+        lseek(file, 453, SEEK_SET);
     }
+    if (strcmp(directory, "friends_house") == 0)
+    {
+        lseek(file, 1128, SEEK_SET);
+    }
+    
     //ADD OTHER DIRECTORIES HERE
     
     //Now, we read at the offset until we see an empty line
