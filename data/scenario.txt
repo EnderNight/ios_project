@@ -7,4 +7,6 @@ Despite feeling lost and confused, you tell yourself one thing :
 “I have to get out of here”
 /
 LEVEL 1
-DO NOT PRINT
+This is the next level :)
+%
+Are you ready for it ? 

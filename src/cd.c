@@ -33,6 +33,10 @@ void readScenario() {
     {
         lseek(file, 6, SEEK_SET);
     }
+    if (strcmp(directory, "test") == 0)
+    {
+        lseek(file, 450, SEEK_SET);
+    }
     //ADD OTHER DIRECTORIES HERE
     
     //Now, we read at the offset until we see an empty line
@@ -41,14 +45,21 @@ void readScenario() {
     
     //Normal read
     while (read(file, &c, 1) == 1 && c != '/') {
-        putchar(c);
-        fflush(stdout);
-        //If there is a newline, we wait
-        if (c == '\n')
-            sleep(1);
-        
-
+        if (c == '%') 
+        {
+            fflush(stdout);
+            usleep(9000);
+            change_color("yellow");
+        }
+        else {
+            putchar(c);
+            fflush(stdout);
+            //If there is a newline, we wait
+            if (c == '\n')
+                //TODO : change this line when tests are gooood
+                sleep(0.8);
         usleep(9000);
+        }
     }
     change_color("white");
 
