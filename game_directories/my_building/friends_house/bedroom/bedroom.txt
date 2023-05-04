@@ -12,8 +12,4 @@ I might not have much time to take a decision.
 
 What should I do?
 
-Possible options:
--> DO_NOTHING
--> KILL_HIM     (there should be a way to restrict the entrance to this directory, as the user must have taken the knife to enter here)
--> RUN_AWAY     (LINK TO FRIENDS_HOUSE)
 

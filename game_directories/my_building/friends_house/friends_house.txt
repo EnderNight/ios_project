@@ -11,9 +11,3 @@ off its hinges, and the windows are smashed. I enter the house, and call out to 
 
 I could either investigate the first floor, or head upstairs to the second floor.
 
-What should I do now?
-
-Possible options:
--> knife.item
--> SECOND_FLOOR
--> MY_BUILDING

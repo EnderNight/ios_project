@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-char *section_titles[] = {"name", "desc", "usage"};
+char *section_titles[] = {"name", "desc", "usage", "use_count"};
 
 int num_titles(void) { return sizeof(section_titles) / sizeof(char *); }
 
@@ -18,6 +18,7 @@ Item *create_item(void) {
     new_item->name = malloc(sizeof(char) * TEXT_SIZE);
     new_item->desc = malloc(sizeof(char) * TEXT_SIZE);
     new_item->usage = malloc(sizeof(char) * TEXT_SIZE);
+    new_item->use_count = malloc(sizeof(char) * TEXT_SIZE);
 
     return new_item;
 }
@@ -27,6 +28,7 @@ void free_item(Item *item) {
     free(item->name);
     free(item->desc);
     free(item->usage);
+    free(item->use_count);
     free(item);
 }
 
