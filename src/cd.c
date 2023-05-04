@@ -89,6 +89,10 @@ int cd(int argc, char *argv[]) {
         if(strcmp(last+1,"start")!=0 && strcmp(last+1,"story")!=0){
             chdir("..");
             //We display the story of the last directory
+            //Put the pointer at the top
+            print("\033[H");
+            //Clear the shell screen
+            print("\033[2J");
             readScenario();
             return 0;
         }else{

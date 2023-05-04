@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <utils.h>
+#include "utils.h"
 
 
 void _ls(const char *dir, int op_a, int op_l) {
@@ -25,13 +25,22 @@ void _ls(const char *dir, int op_a, int op_l) {
         // If hidden files are found we continue
         if (!op_a && d->d_name[0] == '.')
             continue;
-        print("%s  ", d->d_name);
+        if (d->d_type == DT_REG) {
+            //TODO : fix color change
+            change_color("blue");
+            printf("%s  ", d->d_name);
+            change_color("white");
+        } else {
+            printf("%s  ", d->d_name);
+        }
         if (op_l)
-            print("\n");
+            printf("\n");
     }
     if (!op_l)
-        print("\n");
+        printf("\n");
+    closedir(dh);
 }
+
 int main(int argc, const char *argv[]) {
     if (argc == 1) {
         _ls(".", 0, 0);

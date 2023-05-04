@@ -101,7 +101,7 @@ void change_color(char *color) {
     } else if (strcmp(color, "green") == 0) {
         write(0, "\033[0;32m", 7);
     } else if (strcmp(color, "yellow") == 0) {
-        write(0, "\033[0;33m", 7);
+        write(0, "\033[1;33m", 7);
     } else if (strcmp(color, "blue") == 0) {
         write(0, "\033[0;34m", 7);
     } else if (strcmp(color, "magenta") == 0) {
