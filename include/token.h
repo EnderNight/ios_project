@@ -6,12 +6,11 @@
 #include <stddef.h>
 
 typedef enum type {
-    TOKEN_FILE = 1,
-    TOKEN_CMD,
-    TOKEN_REDIR,
-    TOKEN_PIPE,
+    TOKEN_SEMI = 1,
     TOKEN_AMPER,
-    TOKEN_SEMI,
+    TOKEN_PIPE,
+    TOKEN_REDIR,
+    TOKEN_CMD,
 } Type;
 
 typedef struct Token {

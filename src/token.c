@@ -60,7 +60,7 @@ void add_cmd_token(int *i, int *cmd_index, int *tok_index, Tokens *tokens,
 Tokens *tokenize(Input *in) {
 
     Tokens *tokens = malloc(sizeof(Tokens));
-    int i = 0, is_redir = 0, cmd_index = 0, tok_index = 0;
+    int i = 0, cmd_index = 0, tok_index = 0;
 
     tokens->token_list = malloc(sizeof(Token *) * (size_t)in->num_string);
 
@@ -68,14 +68,8 @@ Tokens *tokenize(Input *in) {
 
         if (strcmp(in->sep_cmd[i], "|") == 0) {
             add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_PIPE, in);
-        } else if (is_redir) {
-            tokens->token_list[tok_index] = create_token(in, i, i, TOKEN_FILE);
-            is_redir = 0;
-            ++tok_index;
-            cmd_index = i + 1;
         } else if (strcmp(in->sep_cmd[i], ">") == 0) {
             add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_REDIR, in);
-            is_redir = 1;
         } else if (strcmp(in->sep_cmd[i], "&") == 0) {
             add_cmd_token(&i, &cmd_index, &tok_index, tokens, TOKEN_AMPER, in);
         } else if (strcmp(in->sep_cmd[i], ";") == 0) {

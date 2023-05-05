@@ -34,11 +34,21 @@ Stack_ele *pull(Stack *stack) {
     return elem;
 }
 
-void push(Stack *stack, Token *token) {
+void push_tok(Stack *stack, Token *token) {
 
     Stack_ele *elem = malloc(sizeof(Stack_ele));
 
     elem->token = token;
     elem->prev = stack->cur;
     stack->cur = elem;
+}
+
+void push_ast(Stack *stack, AST *ast) {
+
+    Stack_ele *elem = malloc(sizeof(Stack_ele));
+
+    elem->ast = ast;
+    elem->prev = stack->cur;
+    stack->cur = elem;
+
 }
