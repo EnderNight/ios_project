@@ -13,7 +13,10 @@ Token *create_token(Input *in, int from, int to, Type type) {
 
     tok->type = type;
 
-    tok->command = malloc(sizeof(char *) * len);
+    tok->command = malloc(sizeof(char *) * (len + 1));
+
+    tok->command[len] = NULL;
+
 
     for (size_t i = 0; i < len; ++i) {
         tok->command[i] =

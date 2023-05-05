@@ -218,18 +218,18 @@ char *find_command(Shell *shell, char *cmd_name) {
                                  (strlen(shell->env->list[bin_index]->value) +
                                   strlen(cmd_name)) +
                              2);
-                if (res != NULL) {
-                    strcpy(res, shell->env->list[bin_index]->value);
-                    strcat(res, "/");
-                    strcat(res, cmd_name);
+                if (res == NULL)
+                    perror("Find command");
+                
+                strcpy(res, shell->env->list[bin_index]->value);
+                strcat(res, "/");
+                strcat(res, cmd_name);
 
-                    return res;
-                }
+                return res;
             }
         }
     }
 
-    perror("Find command");
     return NULL;
 }
 
@@ -340,7 +340,8 @@ char *read_cmd(Shell *shell, int *res) {
     return cmd;
 }
 
-int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file, int p[2]) {
+int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
+            int p[2]) {
 
     if (argc > 0) {
 
@@ -352,58 +353,58 @@ int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file, int p
 
         switch (child) {
 
-            case -1:
-                error("fork");
+        case -1:
+            error("fork");
+            break;
+        case 0:
+            cmd = find_command(shell, argv[0]);
+
+            if (cmd == NULL) {
+                print_err("Command not found\n");
                 break;
+            }
+
+            switch (chg_io) {
+
             case 0:
-                cmd = find_command(shell, argv[0]);
+                close(STDIN_FILENO);
 
-                if (cmd == NULL) {
-                    print_err("Command not found\n");
-                    break;
-                }
-
-                switch (chg_io) {
-
-                    case 0:
-                        close(STDIN_FILENO);
-
-                        if (is_file) {
-                            dup(p[0]);
-                        } else {
-                            close(p[WriteEnd]);
-                            dup(p[ReadEnd]);
-                        }
-                        break;
-
-                    case 1:
-                        close(STDOUT_FILENO);
-
-                        if (is_file) {
-                            dup(p[0]);
-                        } else {
-                            close(p[ReadEnd]);
-                            dup(p[WriteEnd]);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-
-                execvp(cmd, argv);
-                free(cmd);
-
-                if (chg_io >= 0) {
-                    if (chg_io)
-                        close(p[0]);
-                    else
-                        close(p[1]);
+                if (is_file) {
+                    dup(p[0]);
+                } else {
+                    close(p[WriteEnd]);
+                    dup(p[ReadEnd]);
                 }
                 break;
+
+            case 1:
+                close(STDOUT_FILENO);
+
+                if (is_file) {
+                    dup(p[0]);
+                } else {
+                    close(p[ReadEnd]);
+                    dup(p[WriteEnd]);
+                }
+                break;
+
             default:
-                wait(&status);
                 break;
+            }
+
+            execvp(cmd, argv);
+            free(cmd);
+
+            if (chg_io >= 0) {
+                if (chg_io)
+                    close(p[0]);
+                else
+                    close(p[1]);
+            }
+            break;
+        default:
+            wait(&status);
+            break;
         }
     }
 
@@ -412,7 +413,8 @@ int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file, int p
 
 // Main loop
 
-int sh_execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file, int p[2]) {
+int sh_execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
+               int p[2]) {
     if (argc == 0)
         return 1;
 
@@ -430,32 +432,32 @@ void executor(AST *ast, Shell *shell, int chg_io, int is_file, int p[2]) {
 
     switch (ast->token->type) {
 
-        case TOKEN_CMD:
-            sh_execute(shell, (int)ast->token->len, ast->token->command, chg_io, is_file, p);
-            break;
+    case TOKEN_CMD:
+        sh_execute(shell, (int)ast->token->len, ast->token->command, chg_io,
+                   is_file, p);
+        break;
 
-        case TOKEN_REDIR:
-            pi[0] = open(ast->children[0]->token->command[0], O_CREAT | O_WRONLY,
-                         S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-            executor(ast->children[1], shell, 1, 1, pi);
-            close(pi[0]);
-            break;
+    case TOKEN_REDIR:
+        pi[0] = open(ast->children[0]->token->command[0], O_CREAT | O_WRONLY,
+                     S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        executor(ast->children[1], shell, 1, 1, pi);
+        close(pi[0]);
+        break;
 
-        case TOKEN_PIPE: ;
+    case TOKEN_PIPE:;
+        int pipeFD[2];
+        if (pipe(pipeFD) < 0)
+            perror("Executor");
 
-            int pipeFD[2];
-            if (pipe(pipeFD) < 0)
-                perror("Executor");
+        executor(ast->children[0], shell, 1, 0, pipeFD);
+        executor(ast->children[1], shell, 0, 0, pipeFD);
 
-            executor(ast->children[0], shell, 1, 0, pipeFD);
-            executor(ast->children[1], shell, 0, 0, pipeFD);
+        close(pipeFD[ReadEnd]);
+        close(pipeFD[WriteEnd]);
+        break;
 
-            close(pipeFD[ReadEnd]);
-            close(pipeFD[WriteEnd]);
-            break;
-
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -471,24 +473,36 @@ int sh_loop(Shell *shell) {
         if ((command = read_cmd(shell, &res)) != NULL && res) {
 
             // print("\nInit command: %s\n", command);
+            //
+            // Input *in = init_input(command);
+            // separate(in);
+            // print_input(in);
+            //
+            // print("\nTokenization\n");
+            // Tokens *tokens = tokenize(in);
+            // print_tokens(tokens);
+            //
+            // print("\nRPN\n");
+            // Tokens *rpn_tokens = to_rpn(tokens);
+            // print_tokens(rpn_tokens);
+            //
+            // print("\nAST\n");
+            // AST *ast = rpn_to_ast(rpn_tokens);
+            // print_ast(ast);
+            //
+            // print("\nExecuting\n");
+            // executor(ast, shell, -1, 0, NULL);
+
 
             Input *in = init_input(command);
             separate(in);
-            // print_input(in);
 
-            // print("\nTokenization\n");
             Tokens *tokens = tokenize(in);
-            // print_tokens(tokens);
 
-            // print("\nRPN\n");
             Tokens *rpn_tokens = to_rpn(tokens);
-            // print_tokens(rpn_tokens);
 
-            // print("\nAST\n");
             AST *ast = rpn_to_ast(rpn_tokens);
-            // print_ast(ast);
 
-            // print("\nExecuting\n");
             executor(ast, shell, -1, 0, NULL);
 
             free_ast(ast);
@@ -496,8 +510,11 @@ int sh_loop(Shell *shell) {
             free_input(in);
             free(command);
         }
-        if (!res)
+        if (!res) {
+            if (command != NULL)
+                free(command);
             sh_exit(shell, 0, NULL);
+        }
     }
 
     return 0;
