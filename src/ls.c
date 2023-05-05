@@ -10,7 +10,7 @@ void _ls(const char *dir, int op_a, int op_l) {
     struct dirent *d;
     DIR *dh = opendir(dir);
     if (!dh) {
-        if (errno = ENOENT) {
+        if (errno == ENOENT) {
             // If the directory is not found
             perror("Directory doesn't exist");
         } else {

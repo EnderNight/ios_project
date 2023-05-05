@@ -50,5 +50,4 @@ void push_ast(Stack *stack, AST *ast) {
     elem->ast = ast;
     elem->prev = stack->cur;
     stack->cur = elem;
-
 }

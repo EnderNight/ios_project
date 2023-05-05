@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
 void free_ast(AST *ast) {
 
     for (int i = 0; i < ast->num_children; ++i) {
@@ -15,7 +13,6 @@ void free_ast(AST *ast) {
 
     free(ast);
 }
-
 
 AST *create_ast(void) {
 
@@ -33,10 +30,11 @@ void add_children(AST *ast, AST *child) {
     if (ast->num_children == 0)
         ast->children = malloc(sizeof(AST *));
     else
-        ast->children = realloc(ast->children, sizeof(AST *) * ((size_t)ast->num_children +1));
+        ast->children = realloc(
+            ast->children, sizeof(AST *) * ((size_t)ast->num_children + 1));
 
     ++ast->num_children;
-    ast->children[ast->num_children -1] = child;
+    ast->children[ast->num_children - 1] = child;
 }
 
 void print_ast(AST *ast) {

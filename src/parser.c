@@ -1,7 +1,7 @@
 #include "parser.h"
+#include "ast.h"
 #include "stack.h"
 #include "token.h"
-#include "ast.h"
 
 #include <stdlib.h>
 
@@ -48,7 +48,6 @@ Tokens *to_rpn(Tokens *infix_tok) {
     return rpn_tok;
 }
 
-
 AST *rpn_to_ast(Tokens *rpn_tokens) {
 
     AST *ast = NULL;
@@ -70,7 +69,7 @@ AST *rpn_to_ast(Tokens *rpn_tokens) {
             temp = pull(stack);
             add_children(ast, temp->ast);
             free(temp);
-            
+
             temp = pull(stack);
             add_children(ast, temp->ast);
             free(temp);
