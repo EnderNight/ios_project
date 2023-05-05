@@ -3,6 +3,8 @@
 #include "input.h"
 #include "token.h"
 #include "utils.h"
+#include "parser.h"
+#include "ast.h"
 
 #include "cd.h"
 
@@ -384,6 +386,24 @@ int sh_execute(Shell *shell, int argc, char *argv[]) {
     return execute(shell, argc, argv);
 }
 
+
+void executor(AST *ast, Shell *shell) {
+
+
+    if (ast->token->type == TOKEN_CMD) {
+        sh_execute(shell, (int)ast->token->len, ast->token->command);
+    }
+
+
+
+}
+
+
+
+
+
+// TODO: check for errors
+// TODO: free everything
 int sh_loop(Shell *shell) {
 
     char *command = NULL;
@@ -397,16 +417,25 @@ int sh_loop(Shell *shell) {
 
             Input *in = init_input(command);
             separate(in);
-
             print_input(in);
 
             print("\nTokenization\n");
             Tokens *tokens = tokenize(in);
             print_tokens(tokens);
 
-            print("\n");
+            print("\nRPN\n");
+            Tokens *rpn_tokens = to_rpn(tokens);
+            print_tokens(rpn_tokens);
 
-            free_tokens(tokens);
+            print("\nAST\n");
+            AST *ast = rpn_to_ast(rpn_tokens);
+            print_ast(ast);
+
+            print("\nExecuting\n");
+            executor(ast, shell);
+
+            free_ast(ast);
+            free_tokens(rpn_tokens);
             free_input(in);
             free(command);
         }
