@@ -32,8 +32,9 @@ TOKEN_TAR = token
 STACK_TAR = stack
 PARSER_TAR = parser
 AST_TAR = ast
+CAT_TAR = cat
 
-EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
+EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR) $(CAT_TAR)
 
 
 
@@ -85,6 +86,14 @@ $(MAN_TAR): $(MAN_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
 	$(CC) $(MAN_OBJ) -o bin/$(MAN_TAR) $(LIBS) $(CFLAGS) 
 
+
+
+CAT_SRC = $(CAT_TAR).c
+CAT_OBJ = $(patsubst %, $(BUILDDIR)/%, $(CAT_SRC:.c=.o))
+ 
+$(CAT_TAR): $(CAT_OBJ) $(MAIN_TARGET) 
+	@mkdir -p bin
+	$(CC) $(CAT_OBJ) -o bin/$(CAT_TAR) $(LIBS) $(CFLAGS) 
 ######
 
 
