@@ -17,7 +17,7 @@ at least, try to get something to convince the police to let me through.
 I can go back to my building or keep going forward to the end of the street. I reckon there was a mall at the end
 of the street.
 /
-friendhouse
+friends_house
 I set out from my home towards my friend's house.
 
 The streets are eerily quiet. I move quickly, keeping to the shadows and trying to avoid drawing attention to myself.
@@ -29,6 +29,7 @@ now, so much more dangerous than it once was. I grip myself, ready to defend mys
 As I approach my friend's house, I can see that it has not escaped the destruction. The front door is hanging
 off its hinges, and the windows are smashed. I enter the house, and call out to my friend. There is no response.
 
+%
 I could either investigate the first floor, or head upstairs to the second floor.
 /
 bedroom
@@ -61,3 +62,77 @@ at me with his vacant eyes. I feel sick to my stomach and drop the knife, which 
 run out of the room, with tears streaming down my face. I know there was no other choice, but it still hurts so much.
 
 There is noting else worth doing here.
+/
+living_room
+The living room of this house exudes an atmosphere of cautious comfort amidst the remnants of an uncertain world.
+Despite the unsettling presence, there are signs of resilience and a determination to find solace amidst disorder.
+
+The furniture in the living room reflects a utilitarian design, with sturdy, well-worn couches and chairs arranged
+strategically for ease of movement and visibility. The upholstery, though faded and threadbare, still holds traces
+of the tenant's meticulous care. The room is sparsely decorated, with minimalistic touches, suggesting a focus on
+practicality over aesthetics.
+
+In spite of what might be expected coming from my friend, it seems that I won't find anything useful in this room.
+/
+kitchen
+The kitchen in this house tells a unique tale of preparedness and macabre adaptation. Despite the eerie
+circumstances, there is a peculiar order amidst the chaos, reflecting my friend's pragmatic approach to life.
+
+I can see a lot of dishes in the sink, and a few on the counter. There is a large pot on the stove, and a few more
+on the floor. The fridge is open, and I can see a few things inside.
+
+As I was looking for something useful, I found a big knife. I hope I don't end up needing it.
+/
+kill_him
+My heart races as I realize what I have to do. I raise my weapon, my hand shaking with fear and grief, and take a step
+towards the being that was once my friend. I hesitate for a moment, but I remember that there is no turning back now.
+I close my eyes and swing the knife with all my might, the sound of metal hitting flesh echoing through the room.
+
+I open my eyes and see that he is still standing, but it's not moving anymore. It's just standing there, staring
+at me with his vacant eyes. I feel sick to my stomach and drop the knife, which clatters to the floor. I turn around and
+run out of the room, with tears streaming down my face. I know there was no other choice, but it still hurts so much.
+/
+investigate
+His room is a total mess. Chaos seems to reign here. The space is littered with various objects, creating an
+untidy and disorganized atmosphere. Papers, tools, and components are scattered haphazardly across the room.
+
+The focal point of the room is his desk, where an unusual item catches the eye. Among the clutter, there lies
+a flamethrower. Its menacing presence seems out of place amidst the friend's tools, suggesting a hint of
+eccentricity or a passion for unique gadgets. The desk itself is cluttered with blueprints, technical manuals,
+and partially completed projects, further illustrating the engineer's scattered mindset.
+
+I I'm glad that my friend was able to at least finish building this before turning into an undead.
+Thank you so much, my friend, I will put it to good use.
+/
+parking
+When a reach the parking, the worst suspicion that I have becomes true. My car is indeed there, but the
+front side is destroyed, and the battery is missing. If I want to use it to get out of here, I will have
+to repair it first. I have no idea where a new battery could be found, but I know that I can repair the
+car if I find one. I will have to search for it.
+/
+road
+I use my keys, and finally hear the car start. Once and for all, I hurry to the highway through the road and
+get as far away from this city as possible. I don't know where I'll go, but anywhere will do. I hope I will be okay.
+/
+mall
+At the end of the street, I find an already abandoned mall. I can see a few people inside, but I can't tell if they are
+alive or dead. At least, they don't seem to be moving.
+
+This place is a dead end, but I might be able to find something useful here.
+/
+1f
+The state of the mall looks as if it was abandoned in a hurry. There are still some items on the shelves, but most of
+them are broken or damaged. All the shops are abandoned, and the only thing I can hear is the sound of my own footsteps.
+
+Besides, I can't see any zombies around. It's like they all disappeared. I don't know if it's a good thing or not. If I
+want to keep going up in the mall, I must start being very careful.
+/
+2f
+When I reach the second floor, the whole place looks even more abandoned than the first floor. There are no lights on,
+and the only thing I can see is the moonlight coming through the windows.
+
+Besides, now I understand where all the zombies went. They are all here, guarding the stairs that lead to the third
+floor. I can't see any other way to go up, so I must fight them if I want to keep going. For doing this, I will need to
+use a crowed control weapon. But, where do I find something like that?
+/
+3f

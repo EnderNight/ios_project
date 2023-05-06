@@ -42,15 +42,73 @@ void readScenario() {
     }
     if (strcmp(directory, "friends_house") == 0)
     {
-        lseek(file, 1128, SEEK_SET);
+        lseek(file, 1130, SEEK_SET);
     }
-    
+    if (strcmp(directory, "living_room") == 0)
+    {
+        lseek(file, 3907, SEEK_SET);
+    }
+    if (strcmp(directory, "bedroom") == 0)
+    {
+        lseek(file, 2011, SEEK_SET);
+    }
+    if (strcmp(directory, "do_nothing") == 0)
+    {
+        lseek(file, 2983, SEEK_SET);
+    }
+    if (strcmp(directory, "kitchen") == 0)
+    {
+        lseek(file, 4637, SEEK_SET);
+    }
+    if (strcmp(directory, "kill_him") == 0)
+    {
+        lseek(file, 5142, SEEK_SET);
+    }
+    if (strcmp(directory, "investigate") == 0)
+    {
+        lseek(file, 5860, SEEK_SET);
+    }
+    if (strcmp(directory, "parking") == 0)
+    {
+        lseek(file, 6686, SEEK_SET);
+    }
+    if (strcmp(directory, "road") == 0)
+    {
+        lseek(file, 7030, SEEK_SET);
+    }
+    if (strcmp(directory, "mall") == 0)
+    {
+        lseek(file, 7263, SEEK_SET);
+    }
+    if (strcmp(directory, "1f") == 0)
+    {
+        lseek(file, 7521, SEEK_SET);
+    }
+    if (strcmp(directory, "2f") == 0)
+    {
+        lseek(file, 7954, SEEK_SET);
+    }
+    if (strcmp(directory, "3f") == 0)
+    {
+        lseek(file, 8460, SEEK_SET);
+    }
     //ADD OTHER DIRECTORIES HERE
     
     //Now, we read at the offset until we see an empty line
     change_color("green");
     char c;
     
+    //Here is the logic for reading
+    //We read character by character
+    //First, we check if the player has the right group
+    //Example : group 4 is required to read text, so we check if the player has the group 4
+    //If not, we keep reading until the group is 4, or we see a /
+    //If there is no text with the group 4, we display nothing
+    
+    //If we have the right group, we print taking into account special characters
+    //If we see a %, we change the color
+    //If we see a \n, we wait a bit
+    //If we see a /, we stop reading
     //Normal read
     while (read(file, &c, 1) == 1 && c != '/') {
         if (c == '%') 
@@ -113,10 +171,9 @@ int cd(int argc, char *argv[]) {
 
     //Check if the player has the right to access the directory
     //If not, print a small text
+    //print("I can't do that !\n Maybe I'm missing something...\n")
     //The player can only access the directory if he has the right group
     //We use the stat function to get the group id
-    struct stat fileStat;
-    //Print content of fileStat
 
 
 
