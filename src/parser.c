@@ -18,7 +18,8 @@ Tokens *to_rpn(Tokens *infix_tok) {
     while (infix_index < infix_tok->num) {
 
         if (infix_tok->token_list[infix_index]->type == TOKEN_CMD) {
-            rpn_tok->token_list[rpn_index] = infix_tok->token_list[infix_index];
+            rpn_tok->token_list[rpn_index] =
+                copy_token(infix_tok->token_list[infix_index]);
             ++rpn_index;
         } else {
 
@@ -26,7 +27,7 @@ Tokens *to_rpn(Tokens *infix_tok) {
                    stack->cur->token->type >
                        infix_tok->token_list[infix_index]->type &&
                    (temp = pull(stack)) != NULL) {
-                rpn_tok->token_list[rpn_index] = temp->token;
+                rpn_tok->token_list[rpn_index] = copy_token(temp->token);
                 free(temp);
                 ++rpn_index;
             }
@@ -37,7 +38,7 @@ Tokens *to_rpn(Tokens *infix_tok) {
     }
 
     while ((temp = pull(stack)) != NULL) {
-        rpn_tok->token_list[rpn_index] = temp->token;
+        rpn_tok->token_list[rpn_index] = copy_token(temp->token);
         free(temp);
         ++rpn_index;
     }
@@ -46,6 +47,23 @@ Tokens *to_rpn(Tokens *infix_tok) {
     free_stack(stack);
 
     return rpn_tok;
+}
+
+int check_rpn(Tokens *rpn_tokens) {
+
+    int size = 0, i = 0, err = 0;
+
+    while (i < rpn_tokens->num && !err) {
+        size += 1 - rpn_tokens->token_list[i]->valence;
+        if (size <= 0)
+            err = 1;
+        ++i;
+    }
+
+    if (err || size != 1)
+        return 0;
+
+    return 1;
 }
 
 AST *rpn_to_ast(Tokens *rpn_tokens) {
@@ -59,12 +77,12 @@ AST *rpn_to_ast(Tokens *rpn_tokens) {
 
         if (rpn_tokens->token_list[i]->type == TOKEN_CMD) {
             ast = create_ast();
-            ast->token = rpn_tokens->token_list[i];
+            ast->token = copy_token(rpn_tokens->token_list[i]);
             push_ast(stack, ast);
             ast = NULL;
         } else {
             ast = create_ast();
-            ast->token = rpn_tokens->token_list[i];
+            ast->token = copy_token(rpn_tokens->token_list[i]);
 
             temp = pull(stack);
             add_children(ast, temp->ast);
@@ -86,5 +104,6 @@ AST *rpn_to_ast(Tokens *rpn_tokens) {
     ast = temp->ast;
     free(temp);
 
+    free_stack(stack);
     return ast;
 }

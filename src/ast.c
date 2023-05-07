@@ -7,10 +7,14 @@
 
 void free_ast(AST *ast) {
 
-    for (int i = 0; i < ast->num_children; ++i) {
-        free_ast(ast->children[i]);
+    if (ast->num_children > 0) {
+        for (int i = 0; i < ast->num_children; ++i) {
+            free_ast(ast->children[i]);
+        }
+        free(ast->children);
     }
 
+    free_token(ast->token);
     free(ast);
 }
 

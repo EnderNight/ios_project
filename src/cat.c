@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #define UNUSED(x) (void)(x);
@@ -14,39 +15,57 @@ int error(char *msg) {
     exit(-1);
 }
 
-int main(int argc, char **argv) {
+int is_directory(char *path) {
 
-    printf("%d\n", argc);
+    struct stat sb;
+    int res = 0, ret;
+
+    if ((ret = stat(path, &sb)) == 0 && S_ISDIR(sb.st_mode))
+        res = 1;
+
+    if (ret == -1)
+        error("cat: cannot get file info");
+
+    return res;
+}
+
+int main(int argc, char **argv) {
 
     if (argc < 1)
         return EXIT_FAILURE;
 
     int fd;
     char *res;
-    size_t i, size, len, eof = 0;
+    size_t i, size, len, eof;
     ssize_t ret = 0;
 
-    for (int j = -1; j < argc -1; ++j) {
+    for (int j = -1; j < argc - 1; ++j) {
+
+        eof = 0;
 
         if (argc == 1)
             fd = STDIN_FILENO;
         else {
             if (j == -1)
                 j = 0;
-            fd = open(argv[j + 1], O_RDONLY);
+
+            if (!is_directory(argv[j + 1]))
+                fd = open(argv[j + 1], O_RDONLY);
+            else
+                fd = -2;
         }
 
         if (fd == -1)
-            error("Cat");
+            error("cat: cannot open file");
 
-        while (!eof) {
+        while (!eof && fd != -2) {
 
             res = malloc(sizeof(char));
             i = len = 0;
             size = 1;
 
             while (res != NULL && (ret = read(fd, res + i, sizeof(char))) > 0 &&
-                res[i] != '\n') {
+                   res[i] != '\n') {
                 ++i;
                 if (i == size) {
                     size *= 2;
@@ -57,19 +76,22 @@ int main(int argc, char **argv) {
             if (ret == 0)
                 eof = 1;
 
-            if (ret == -1 || res == NULL)
-                error("Cat");
+            if (ret == -1)
+                error("cat: error while reading input");
+
+            if (res == NULL)
+                error("cat: not enough memory");
 
             ++i;
             res = realloc(res, sizeof(char) * (i + 1));
             if (res == NULL)
-                error("Cat");
+                error("cat: not enough memory");
             res[i] = '\0';
 
             len = strlen(res);
             ret = write(STDOUT_FILENO, res, len);
             if (ret != (ssize_t)len)
-                error("Cat");
+                error("cat: could not write whole text");
 
             free(res);
         }

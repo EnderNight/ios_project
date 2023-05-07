@@ -24,17 +24,17 @@ void _ls(const char *dir, int op_a, int op_l) {
         // If hidden files are found we continue
         if (!op_a && d->d_name[0] == '.')
             continue;
-        print("%s  ", d->d_name);
+        printf("%s  ", d->d_name);
         if (op_l)
-            print("\n");
+            printf("\n");
     }
     if (!op_l)
-        print("\n");
+        printf("\n");
 }
 int main(int argc, const char *argv[]) {
     if (argc == 1) {
         _ls(".", 0, 0);
-    } else if (argc == 2) {
+    } else if (argc <= 3) {
         if (argv[1][0] == '-') {
             // Checking if option is passed
             // Options supporting: a, l
@@ -51,7 +51,12 @@ int main(int argc, const char *argv[]) {
                 }
                 p++;
             }
-            _ls(".", op_a, op_l);
+            if (argc == 2)
+                _ls(".", op_a, op_l);
+            else
+                _ls(argv[2], op_a, op_l);
+        } else {
+            _ls(argv[1], 0, 0);
         }
     }
     return 0;

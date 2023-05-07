@@ -27,7 +27,7 @@ typedef struct Shell {
 } Shell;
 
 Shell *sh_init(void);
-int sh_loop(Shell *shell);
+int sh_loop(Shell *shell, int debug);
 void sh_end(Shell *shell);
 
 #endif // SHELL_H

@@ -220,17 +220,17 @@ char *find_command(Shell *shell, char *cmd_name) {
                              2);
                 if (res == NULL)
                     perror("Find command");
-                
+
                 strcpy(res, shell->env->list[bin_index]->value);
                 strcat(res, "/");
                 strcat(res, cmd_name);
-
-                return res;
             }
+
+            closedir(bindir);
         }
     }
 
-    return NULL;
+    return res;
 }
 
 // Boot
@@ -251,8 +251,8 @@ Shell *sh_init(void) {
 }
 
 // BUILTINS
-
 char *builtin_str[] = {"cd", "env", "exit"};
+int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
     UNUSED(shell);
@@ -270,9 +270,41 @@ int sh_exit(Shell *shell, int argc, char **argv) {
     return terminate(shell);
 }
 
-int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
-
 int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit};
+
+int check_builtin(char *cmd) {
+
+    int i = 0, found = 0;
+
+    while (i < sh_num_builtins() && !found) {
+        found = strcmp(cmd, builtin_str[i]) == 0;
+        ++i;
+    }
+
+    return found;
+}
+
+int check_ast(Shell *shell, AST *ast, int *num_cmd) {
+
+    char *cmd;
+
+    if (ast->token->type == TOKEN_CMD) {
+        if ((cmd = find_command(shell, ast->token->command[0])) != NULL ||
+            check_builtin(ast->token->command[0])) {
+            free(cmd);
+            ++*num_cmd;
+            return 1;
+        }
+        print_err("Syntax error: unknown command %s\n", ast->token->command[0]);
+        return 0;
+    }
+
+    if (ast->token->type == TOKEN_REDIR)
+        return check_ast(shell, ast->children[1], num_cmd);
+
+    return check_ast(shell, ast->children[0], num_cmd) &&
+           check_ast(shell, ast->children[1], num_cmd);
+}
 
 /*
  * Get the enterred command in stdin.
@@ -340,13 +372,11 @@ char *read_cmd(Shell *shell, int *res) {
     return cmd;
 }
 
-int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
-            int p[2]) {
+int execute(Shell *shell, int argc, char *argv[], int p[2], int end) {
 
     if (argc > 0) {
 
         pid_t child;
-        int status;
         char *cmd = NULL;
 
         child = fork();
@@ -359,51 +389,16 @@ int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
         case 0:
             cmd = find_command(shell, argv[0]);
 
-            if (cmd == NULL) {
-                print_err("Command not found\n");
-                break;
-            }
-
-            switch (chg_io) {
-
-            case 0:
-                close(STDIN_FILENO);
-
-                if (is_file) {
-                    dup(p[0]);
-                } else {
+            if (p != NULL) {
+                if (end == ReadEnd)
                     close(p[WriteEnd]);
-                    dup(p[ReadEnd]);
-                }
-                break;
-
-            case 1:
-                close(STDOUT_FILENO);
-
-                if (is_file) {
-                    dup(p[0]);
-                } else {
+                else
                     close(p[ReadEnd]);
-                    dup(p[WriteEnd]);
-                }
-                break;
-
-            default:
-                break;
             }
 
             execvp(cmd, argv);
-            free(cmd);
-
-            if (chg_io >= 0) {
-                if (chg_io)
-                    close(p[0]);
-                else
-                    close(p[1]);
-            }
             break;
         default:
-            wait(&status);
             break;
         }
     }
@@ -413,8 +408,7 @@ int execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
 
 // Main loop
 
-int sh_execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
-               int p[2]) {
+int sh_execute(Shell *shell, int argc, char *argv[], int p[2], int end) {
     if (argc == 0)
         return 1;
 
@@ -423,92 +417,165 @@ int sh_execute(Shell *shell, int argc, char *argv[], int chg_io, int is_file,
             return (*builtin_func[i])(shell, argc, argv);
     }
 
-    return execute(shell, argc, argv, chg_io, is_file, p);
+    return execute(shell, argc, argv, p, end);
 }
 
-void executor(AST *ast, Shell *shell, int chg_io, int is_file, int p[2]) {
+int executor(AST *ast, Shell *shell, int init_in, int init_out, int fdin,
+             int fdout, int p[2], int end) {
 
-    int pi[2];
+    if (ast->token->type == TOKEN_CMD) {
 
-    switch (ast->token->type) {
+        // Redirection
+        if (fdin == -1)
+            fdin = dup(init_in);
+        if (fdout == -1)
+            fdout = dup(init_out);
 
-    case TOKEN_CMD:
-        sh_execute(shell, (int)ast->token->len, ast->token->command, chg_io,
-                   is_file, p);
-        break;
+        dup2(fdin, STDIN_FILENO);
+        close(fdin);
+        dup2(fdout, STDOUT_FILENO);
+        close(fdout);
 
-    case TOKEN_REDIR:
-        pi[0] = open(ast->children[0]->token->command[0], O_CREAT | O_WRONLY,
-                     S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-        executor(ast->children[1], shell, 1, 1, pi);
-        close(pi[0]);
-        break;
-
-    case TOKEN_PIPE:;
-        int pipeFD[2];
-        if (pipe(pipeFD) < 0)
-            perror("Executor");
-
-        executor(ast->children[0], shell, 1, 0, pipeFD);
-        executor(ast->children[1], shell, 0, 0, pipeFD);
-
-        close(pipeFD[ReadEnd]);
-        close(pipeFD[WriteEnd]);
-        break;
-
-    default:
-        break;
+        return sh_execute(shell, (int)ast->token->len, ast->token->command, p,
+                          end);
     }
+
+    else if (ast->token->type == TOKEN_PIPE) {
+
+        if (ast->children[1]->token->type == TOKEN_REDIR) {
+            executor(ast->children[1], shell, init_in, init_out, fdin, fdout, p,
+                     end);
+            executor(ast->children[0], shell, init_in, init_out, fdin, fdout, p,
+                     end);
+        } else {
+            int pipeFD[2];
+            pipe(pipeFD);
+
+            executor(ast->children[1], shell, init_in, init_out, fdin,
+                     pipeFD[WriteEnd], pipeFD, WriteEnd);
+            executor(ast->children[0], shell, init_in, init_out,
+                     pipeFD[ReadEnd], fdout, pipeFD, ReadEnd);
+        }
+    }
+
+    else if (ast->token->type == TOKEN_REDIR) {
+
+        if (ast->children[0]->token->type == TOKEN_CMD) {
+            int fd = open(ast->children[0]->token->command[0],
+                          O_CREAT | O_TRUNC | O_WRONLY,
+                          S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+            if (fd == -1)
+                error("Executor");
+
+            executor(ast->children[1], shell, init_in, init_out, fdin, fd, p,
+                     end);
+
+            close(fd);
+        }
+    }
+
+    return 0;
+}
+
+int init_executor(AST *ast, Shell *shell, int num_cmd) {
+
+    int tmpin, tmpout, num = 0, status;
+
+    tmpin = dup(STDIN_FILENO);
+    tmpout = dup(STDOUT_FILENO);
+
+    executor(ast, shell, tmpin, tmpout, -1, -1, NULL, -1);
+
+    while (num < num_cmd) {
+        wait(&status);
+        ++num;
+    }
+
+    dup2(tmpin, STDIN_FILENO);
+    dup2(tmpout, STDOUT_FILENO);
+    close(tmpin);
+    close(tmpout);
+
+    return 0;
 }
 
 // TODO: check for errors
 // TODO: free everything
-int sh_loop(Shell *shell) {
+int sh_loop(Shell *shell, int debug) {
 
     char *command = NULL;
-    int res;
+    int res, num_cmd = 0;
+    Input *in;
+    Tokens *tokens, *rpn_tokens;
+    AST *ast;
 
     while (shell->is_running) {
         print("%s", shell->env->list[1]->value);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
 
-            // print("\nInit command: %s\n", command);
-            //
-            // Input *in = init_input(command);
-            // separate(in);
-            // print_input(in);
-            //
-            // print("\nTokenization\n");
-            // Tokens *tokens = tokenize(in);
-            // print_tokens(tokens);
-            //
-            // print("\nRPN\n");
-            // Tokens *rpn_tokens = to_rpn(tokens);
-            // print_tokens(rpn_tokens);
-            //
-            // print("\nAST\n");
-            // AST *ast = rpn_to_ast(rpn_tokens);
-            // print_ast(ast);
-            //
-            // print("\nExecuting\n");
-            // executor(ast, shell, -1, 0, NULL);
+            if (debug) {
 
+                print("\nInit command: %s\n", command);
 
-            Input *in = init_input(command);
-            separate(in);
+                in = init_input(command);
+                if (separate(in)) {
+                    print_input(in);
 
-            Tokens *tokens = tokenize(in);
+                    print("\nTokenization\n");
+                    tokens = tokenize(in);
+                    print_tokens(tokens);
 
-            Tokens *rpn_tokens = to_rpn(tokens);
+                    print("\nRPN\n");
+                    rpn_tokens = to_rpn(tokens);
+                    if (check_rpn(rpn_tokens)) {
+                        print_tokens(rpn_tokens);
 
-            AST *ast = rpn_to_ast(rpn_tokens);
+                        print("\nAST\n");
+                        ast = rpn_to_ast(rpn_tokens);
+                        if (check_ast(shell, ast, &num_cmd)) {
+                            print_ast(ast);
 
-            executor(ast, shell, -1, 0, NULL);
+                            print("\nExecuting\n");
+                            init_executor(ast, shell, num_cmd);
+                        }
+                        free_ast(ast);
 
-            free_ast(ast);
-            free_tokens(rpn_tokens);
-            free_input(in);
-            free(command);
+                    } else
+                        print_err("Error: invalid command.\n");
+
+                    free_tokens(rpn_tokens);
+                    free_tokens(tokens);
+                }
+                free_input(in);
+                free(command);
+            }
+
+            else {
+
+                in = init_input(command);
+                if (separate(in)) {
+
+                    tokens = tokenize(in);
+                    rpn_tokens = to_rpn(tokens);
+
+                    if (check_rpn(rpn_tokens)) {
+                        ast = rpn_to_ast(rpn_tokens);
+
+                        if (check_ast(shell, ast, &num_cmd))
+                            init_executor(ast, shell, num_cmd);
+
+                        free_ast(ast);
+
+                    } else
+                        print_err("Semantic error: invalid command.\n");
+
+                    free_tokens(rpn_tokens);
+                    free_tokens(tokens);
+                }
+
+                free_input(in);
+                free(command);
+            }
         }
         if (!res) {
             if (command != NULL)

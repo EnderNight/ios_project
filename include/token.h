@@ -17,6 +17,7 @@ typedef struct Token {
     Type type;
     char **command;
     size_t len;
+    int valence;
 } Token;
 
 typedef struct Tokens {
@@ -31,5 +32,6 @@ void print_tokens(Tokens *tokens);
 void print_token(Token *token);
 void free_token(Token *token);
 void free_tokens(Tokens *token);
+Token *copy_token(Token *tok);
 
 #endif // TOKEN_H

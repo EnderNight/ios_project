@@ -17,7 +17,6 @@ Token *create_token(Input *in, int from, int to, Type type) {
 
     tok->command[len] = NULL;
 
-
     for (size_t i = 0; i < len; ++i) {
         tok->command[i] =
             malloc(sizeof(char) * (strlen(in->sep_cmd[(size_t)from + i]) + 1));
@@ -25,6 +24,8 @@ Token *create_token(Input *in, int from, int to, Type type) {
     }
 
     tok->len = len;
+
+    tok->valence = tok->type == TOKEN_CMD ? 0 : 2;
 
     return tok;
 }
@@ -45,6 +46,7 @@ void free_tokens(Tokens *tokens) {
         free_token(tokens->token_list[i]);
     }
 
+    free(tokens->token_list);
     free(tokens);
 }
 
@@ -58,6 +60,25 @@ void add_cmd_token(int *i, int *cmd_index, int *tok_index, Tokens *tokens,
     tokens->token_list[*tok_index] = create_token(in, *i, *i, type);
     *cmd_index = *i + 1;
     ++*tok_index;
+}
+
+Token *copy_token(Token *tok) {
+
+    Token *res = malloc(sizeof(Token));
+
+    res->type = tok->type;
+    res->len = tok->len;
+
+    res->command = malloc(sizeof(char *) * (res->len + 1));
+    res->command[res->len] = NULL;
+    for (size_t i = 0; i < res->len; ++i) {
+        res->command[i] = malloc(sizeof(char) * (strlen(tok->command[i]) + 1));
+        strcpy(res->command[i], tok->command[i]);
+    }
+
+    res->valence = tok->valence;
+
+    return res;
 }
 
 Tokens *tokenize(Input *in) {
@@ -99,7 +120,8 @@ void print_token(Token *token) {
     for (size_t i = 0; i < token->len - 1; ++i) {
         print("%s ", token->command[i]);
     }
-    print("%s', type: %d\n", token->command[token->len - 1], token->type);
+    print("%s', type: %d, valence: %d\n", token->command[token->len - 1],
+          token->type, token->valence);
 }
 
 void print_tokens(Tokens *tokens) {
@@ -109,8 +131,8 @@ void print_tokens(Tokens *tokens) {
         for (size_t i = 0; i < tokens->token_list[j]->len - 1; ++i) {
             print("%s ", tokens->token_list[j]->command[i]);
         }
-        print("%s', type: %d\n",
+        print("%s', type: %d, valence: %d\n",
               tokens->token_list[j]->command[tokens->token_list[j]->len - 1],
-              tokens->token_list[j]->type);
+              tokens->token_list[j]->type, tokens->token_list[j]->valence);
     }
 }

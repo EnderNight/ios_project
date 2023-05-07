@@ -8,7 +8,7 @@
 // If you are on the server, remove the argument '-fsanitize=address' inside the
 // Makefile file!!
 
-int main(void) {
+int main(int argc, char **argv) {
     // Clear the shell screen
     // write(0, "\033[2J", 4);
     // write(0, "\033[H", 3);
@@ -33,15 +33,32 @@ int main(void) {
     ////Change the shell color
     // change_color("white");
 
-    Shell *shell;
+    if (argc > 0 && argc < 3) {
 
-    shell = sh_init();
+        Shell *shell;
+        int debug = 0;
 
-    if (shell == NULL) {
-        print("Error while shell bootstrap.");
-    } else {
-        sh_loop(shell);
+        shell = sh_init();
+
+        if (shell == NULL) {
+            print("Error while shell bootstrap.");
+        } else {
+            if (argc == 2)
+                debug = atoi(argv[1]);
+            if (debug != 0 && debug != 1) {
+                print("Incorrect debug value '%d'. Must be either nothing, 0 "
+                      "or 1.\n",
+                      debug);
+                sh_end(shell);
+                return 1;
+            } else
+                sh_loop(shell, debug);
+        }
+
+        sh_end(shell);
+        return 0;
     }
 
-    sh_end(shell);
+    print("Incorrect number of arguments: ./main <debug switch (optional)>\n");
+    return 1;
 }

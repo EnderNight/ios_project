@@ -37,6 +37,8 @@ CAT_TAR = cat
 EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR) $(CAT_TAR)
 
 
+multi:
+	$(MAKE) -j10 all
 
 
 

@@ -26,7 +26,7 @@ void free_input(Input *in) {
     free(in);
 }
 
-void separate(Input *in) {
+int separate(Input *in) {
 
     size_t size = 1, i = 0;
     char *cmdp = in->single_cmd;
@@ -45,6 +45,8 @@ void separate(Input *in) {
 
     in->sep_cmd = realloc(in->sep_cmd, sizeof(char *) * (i + 1));
     in->num_string = (int)i;
+
+    return in->num_string;
 }
 
 void print_input(Input *in) {
