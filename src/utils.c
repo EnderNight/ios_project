@@ -10,7 +10,7 @@
 /*
  * Print @text to stdout.
  *
- * @format: the text to be print out, in printf like format.
+ * @format: the text to be printed out, in printf like format.
  *
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem
@@ -49,7 +49,7 @@ int print_fd(int filedes, const char *fmt, va_list args) {
 /*
  * Print @text to stdout.
  *
- * @format: the text to be print out, in printf like format.
+ * @format: the text to be printed out, in printf like format.
  *
  * Returns: EXIT_SUCCESS if everything was printed out
  *          EXIT_FAILURE if there was a problem

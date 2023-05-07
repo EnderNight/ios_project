@@ -8,7 +8,7 @@
 // If you are on the server, remove the argument '-fsanitize=address' inside the
 // Makefile file!!
 
-int main(void) {
+int main(int argc, char **argv) {
     // Clear the shell screen
     // write(0, "\033[2J", 4);
     // write(0, "\033[H", 3);
@@ -33,28 +33,45 @@ int main(void) {
     ////Change the shell color
     // change_color("white");
 
-    Shell *shell;
+    if (argc > 0 && argc < 3) {
 
-    shell = sh_init();
+        Shell *shell;
+        int debug = 0;
 
-    if (shell == NULL) {
-        print("Error while shell bootstrap.");
-    } else {
-        //We put the player inside the right directory
-        //TODO : should be something else than /test
-        
-        //Put the pointer at the top
-        print("\033[H");
-        //Clear the shell screen
-        print("\033[2J");
+        shell = sh_init();
 
-        //Going to the right directory, will display the story
-        chdir("story");
-        change_color("cyan");
-        print("When you are ready, go to the start directory!\n");
-        change_color("white");
-        sh_loop(shell);
+        if (shell == NULL) {
+            print("Error while shell bootstrap.");
+        } else {
+            if (argc == 2)
+                debug = atoi(argv[1]);
+            if (debug != 0 && debug != 1) {
+                print("Incorrect debug value '%d'. Must be either nothing, 0 "
+                      "or 1.\n",
+                      debug);
+                sh_end(shell);
+                return 1;
+            } else
+                    //We put the player inside the right directory
+                    //TODO : should be something else than /test
+
+                    //Put the pointer at the top
+                    print("\033[H");
+                //Clear the shell screen
+                print("\033[2J");
+
+                //Going to the right directory, will display the story
+                chdir("story");
+                change_color("cyan");
+                print("When you are ready, go to the start directory!\n");
+                change_color("white");
+                sh_loop(shell, debug);
+            }
+
+        sh_end(shell);
+        return 0;
     }
 
-    sh_end(shell);
+    print("Incorrect number of arguments: ./main <debug switch (optional)>\n");
+    return 1;
 }
