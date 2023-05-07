@@ -32,7 +32,7 @@ void _ls(const char *dir, int op_a, int op_l) {
         } else {
             printf("%s  ", d->d_name);
         }
-        printf("%s  ", d->d_name);
+        // printf("%s  ", d->d_name);
         if (op_l)
             printf("\n");
     }
