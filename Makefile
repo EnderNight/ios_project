@@ -27,15 +27,24 @@ MAN_TAR = man
 SHELL_TAR = shell
 UTILS_TAR = utils
 ITEM_TAR = item
-EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR)
+INPUT_TAR = input
+TOKEN_TAR = token
+STACK_TAR = stack
+PARSER_TAR = parser
+AST_TAR = ast
+CAT_TAR = cat
+
+EXECUTABLES ?= $(MAIN_TARGET) $(WHERE_AM_I_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR) $(CAT_TAR)
 
 
+multi:
+	$(MAKE) -j10 all
 
 
 
 all: $(EXECUTABLES)
 ########## MAIN EXECUTABLE ########
-MAIN_TARGET_SRC = $(MAIN_TARGET).c $(SHELL_TAR).c $(UTILS_TAR).c $(CD_TAR).c
+MAIN_TARGET_SRC = $(MAIN_TARGET).c $(SHELL_TAR).c $(UTILS_TAR).c $(CD_TAR).c $(INPUT_TAR).c $(TOKEN_TAR).c $(PARSER_TAR).c $(STACK_TAR).c $(AST_TAR).c
 MAIN_TARGET_OBJ = $(patsubst %, $(BUILDDIR)/%, $(MAIN_TARGET_SRC:.c=.o))
 
 $(MAIN_TARGET): $(MAIN_TARGET_OBJ)
@@ -79,6 +88,14 @@ $(MAN_TAR): $(MAN_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
 	$(CC) $(MAN_OBJ) -o bin/$(MAN_TAR) $(LIBS) $(CFLAGS) 
 
+
+
+CAT_SRC = $(CAT_TAR).c
+CAT_OBJ = $(patsubst %, $(BUILDDIR)/%, $(CAT_SRC:.c=.o))
+ 
+$(CAT_TAR): $(CAT_OBJ) $(MAIN_TARGET) 
+	@mkdir -p bin
+	$(CC) $(CAT_OBJ) -o bin/$(CAT_TAR) $(LIBS) $(CFLAGS) 
 ######
 
 

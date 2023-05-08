@@ -5,13 +5,12 @@
 
 #include "utils.h"
 
-
 void _ls(const char *dir, int op_a, int op_l) {
     // Here we will list the directory
     struct dirent *d;
     DIR *dh = opendir(dir);
     if (!dh) {
-        if (errno = ENOENT) {
+        if (errno == ENOENT) {
             // If the directory is not found
             perror("Directory doesn't exist");
         } else {
@@ -33,6 +32,7 @@ void _ls(const char *dir, int op_a, int op_l) {
         } else {
             printf("%s  ", d->d_name);
         }
+        // printf("%s  ", d->d_name);
         if (op_l)
             printf("\n");
     }
@@ -44,7 +44,7 @@ void _ls(const char *dir, int op_a, int op_l) {
 int main(int argc, const char *argv[]) {
     if (argc == 1) {
         _ls(".", 0, 0);
-    } else if (argc == 2) {
+    } else if (argc <= 3) {
         if (argv[1][0] == '-') {
             // Checking if option is passed
             // Options supporting: a, l
@@ -61,8 +61,14 @@ int main(int argc, const char *argv[]) {
                 }
                 p++;
             }
-            _ls(".", op_a, op_l);
+            if (argc == 2)
+                _ls(".", op_a, op_l);
+            else
+                _ls(argv[2], op_a, op_l);
+        } else {
+            _ls(argv[1], 0, 0);
         }
     }
     return 0;
 }
+
