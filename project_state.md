@@ -7,7 +7,7 @@
 - [ ] lseek
 - [ ] link
 - [ ] unlink
-- [ ] stat
+- [x] stat
 
 # Library functions
 - [x] opendir
@@ -20,8 +20,8 @@
 - [x] wait
 
 # Todo
-- [ ] Pipes
-- [ ] Each command should work without the shell
+- [x] Pipes
+- [x] Each command should work without the shell
 - [ ] List last command used
 - [ ] All errors should be handled (with errno and without) 
 - [ ] All commands must have a man page
