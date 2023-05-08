@@ -29,19 +29,19 @@ void readScenario() {
     // We use lseek to go to the right place in the file
     // The offset is the number of characters in the file
     // In order to get the offset, we execute this command on a terminal :
-    // grep -b -o 'Directory' scenario.txt | awk '{print $1+length("Directory")
+    // grep -b -o 'Directory' scenario.txt | awk '{print $1+length("Directory")}'
     // + 1}' We get the number of bytes before the word
     if (strcmp(directory, "start") == 0) {
         lseek(file, 6, SEEK_SET);
     }
     if (strcmp(directory, "roundabout") == 0) {
-        lseek(file, 453, SEEK_SET);
+        lseek(file, 452, SEEK_SET);
     }
     if (strcmp(directory, "friends_house") == 0) {
         lseek(file, 1130, SEEK_SET);
     }
     if (strcmp(directory, "living_room") == 0) {
-        lseek(file, 3907, SEEK_SET);
+        lseek(file, 4156, SEEK_SET);
     }
     if (strcmp(directory, "bedroom") == 0) {
         lseek(file, 2011, SEEK_SET);
@@ -50,31 +50,40 @@ void readScenario() {
         lseek(file, 2983, SEEK_SET);
     }
     if (strcmp(directory, "kitchen") == 0) {
-        lseek(file, 4637, SEEK_SET);
+        lseek(file, 4886, SEEK_SET);
     }
     if (strcmp(directory, "kill_him") == 0) {
-        lseek(file, 5142, SEEK_SET);
+        lseek(file, 5391, SEEK_SET);
+    }
+    if (strcmp(directory, "talk") == 0) {
+        lseek(file, 3155, SEEK_SET);
     }
     if (strcmp(directory, "investigate") == 0) {
-        lseek(file, 5860, SEEK_SET);
+        lseek(file, 6109, SEEK_SET);
     }
     if (strcmp(directory, "parking") == 0) {
-        lseek(file, 6686, SEEK_SET);
-    }
-    if (strcmp(directory, "road") == 0) {
-        lseek(file, 7030, SEEK_SET);
+        lseek(file, 6910, SEEK_SET);
     }
     if (strcmp(directory, "mall") == 0) {
-        lseek(file, 7263, SEEK_SET);
+        lseek(file, 11245, SEEK_SET);
     }
     if (strcmp(directory, "1f") == 0) {
-        lseek(file, 7521, SEEK_SET);
+        lseek(file, 8732, SEEK_SET);
     }
     if (strcmp(directory, "2f") == 0) {
-        lseek(file, 7954, SEEK_SET);
+        lseek(file, 11504, SEEK_SET);
     }
     if (strcmp(directory, "3f") == 0) {
-        lseek(file, 8460, SEEK_SET);
+        lseek(file, 9672, SEEK_SET);
+    }
+    if (strcmp(directory, "car") == 0) {
+        lseek(file, 7278, SEEK_SET);
+    }
+    if (strcmp(directory, "fix_car") == 0) {
+        lseek(file, 10255, SEEK_SET);
+    }
+    if (strcmp(directory, "pass_them") == 0) {
+        lseek(file, 7868, SEEK_SET);
     }
     // ADD OTHER DIRECTORIES HERE
 
@@ -103,10 +112,23 @@ void readScenario() {
             // If there is a newline, we wait
             if (c == '\n')
                 // TODO : change this line when tests are gooood
-                sleep(0.8);
-            usleep(9000);
+                sleep(0);
+            usleep(0);
         }
     }
+
+    //Here, we print the death messages, or win messages
+    if (strcmp(directory, "do_nothing") == 0 || 
+    strcmp(directory, "talk") == 0 ||
+    strcmp(directory, "pass_them") == 0) {
+        change_color("red");
+        print("\nYou died ! Go back with cd .. to try again !\n");
+    }
+    if (strcmp(directory, "fix_car") == 0) {
+        change_color("red");
+        print("\nYou won ! Good joob :)\n");
+    }
+
     change_color("white");
 
     close(file);
@@ -125,16 +147,17 @@ int cd(int argc, char *argv[]) {
         return 1;
     }
 
-    // See if the user wants to go back when starting
-    // He cannot, so block
+
     if (argv[1][0] == '.') {
         char cwd[456];
         getcwd(cwd, sizeof(cwd));
         char *last = strrchr(cwd, '/');
+        // We display the story of the last directory
+        // Put the pointer at the top
+        // See if the user wants to go back when starting
+        // He cannot, so block
         if (strcmp(last + 1, "start") != 0 && strcmp(last + 1, "story") != 0) {
             chdir("..");
-            // We display the story of the last directory
-            // Put the pointer at the top
             print("\033[H");
             // Clear the shell screen
             print("\033[2J");
@@ -146,6 +169,10 @@ int cd(int argc, char *argv[]) {
             change_color("white");
             return 0;
         }
+        
+        // Before reading, we check the user's global rank
+        // If he made a choice, check the directory he is in, and depending on it we decide if we print the story or not
+        // EXAMPLE : Kill_him we do not display text if the player goes back to it
     }
 
     // Check if the player has the right to access the directory
@@ -163,7 +190,6 @@ int cd(int argc, char *argv[]) {
 
     // Here, the access to the directory is a success
     // So we display the story with lseek depending on the directory
-    // Only way is to do switch case with each directory
     // We implement it this way just to use lseek
     readScenario();
 

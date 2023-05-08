@@ -13,7 +13,7 @@ the crowd that are armed with guns, and I can see a few police officers with the
 
 I might be able to get through the barricade, but I think I should try to find another way out of the city first, or
 at least, try to get something to convince the police to let me through.
-
+%
 I can go back to my building or keep going forward to the end of the street. I reckon there was a mall at the end
 of the street.
 /
@@ -50,18 +50,28 @@ do_nothing
 I can't move. I'm frozen in place, unable to process what I'm seeing.
 
 While on this state, my friend approaches me and bites me in the neck.
-
+%
 I feel a sharp pain.
 /
-My heart races as I realize what I have to do. I raise my weapon, my hand shaking with fear and grief, and take a step
-towards the being that was once my friend. I hesitate for a moment, but I remember that there is no turning back now.
-I close my eyes and swing the knife with all my might, the sound of metal hitting flesh echoing through the room.
+talk
+I take a deep breath and try to calm my racing heart. 
+My friend is dead, but now he's moving towards me with a look of pure hatred in his eyes. 
 
-I open my eyes and see that he is still standing, but it's not moving anymore. It's just standing there, staring
-at me with his vacant eyes. I feel sick to my stomach and drop the knife, which clatters to the floor. I turn around and
-run out of the room, with tears streaming down my face. I know there was no other choice, but it still hurts so much.
+I feel an overwhelming urge to try and reason with him, to understand what's happening and how he could be back from the dead.
 
-There is noting else worth doing here.
+Without thinking, I step towards him and say, "Friend, what's happened to you? Can you hear me?"
+My friend's reanimated body doesn't respond to my words. 
+Instead, it lunges at me with unnatural speed and strength. 
+
+I try to dodge, but it's too fast, and it grabs me by the throat. 
+I feel its cold, lifeless grip tighten around my neck, and I gasp for air.
+
+As my vision starts to fade and my consciousness slips away, 
+I realize that trying to talk to a reanimated corpse was a fatal mistake. 
+I should have fled the room and sought help, or better yet, avoided this house altogether.
+
+But it's too late now. 
+My last thoughts are of regret and fear as my life slips away in the clutches of my undead friend.
 /
 living_room
 The living room of this house exudes an atmosphere of cautious comfort amidst the remnants of an uncertain world.
@@ -105,20 +115,40 @@ I I'm glad that my friend was able to at least finish building this before turni
 Thank you so much, my friend, I will put it to good use.
 /
 parking
-When a reach the parking, the worst suspicion that I have becomes true. My car is indeed there, but the
+When I reach the parking, the worst suspicion that I have becomes true. My car is indeed there, but the
 front side is destroyed, and the battery is missing. If I want to use it to get out of here, I will have
 to repair it first. I have no idea where a new battery could be found, but I know that I can repair the
 car if I find one. I will have to search for it.
 /
-road
-I use my keys, and finally hear the car start. Once and for all, I hurry to the highway through the road and
-get as far away from this city as possible. I don't know where I'll go, but anywhere will do. I hope I will be okay.
-/
-mall
-At the end of the street, I find an already abandoned mall. I can see a few people inside, but I can't tell if they are
-alive or dead. At least, they don't seem to be moving.
+car
+I walk towards the car in the parking lot and notice that the keys are inside. 
+Excited by my good fortune, I hop in the driver's seat and turn the key, hoping to hear the engine roar to life. 
+But there's no response. The dashboard lights up, but the engine won't start.
 
-This place is a dead end, but I might be able to find something useful here.
+Looking at the dashboard, I see a "Battery Low" sign. 
+I realize that the car battery is dead, and I need to find a new one. 
+I search the car for any clues, but find nothing useful. 
+
+As I step out of the car, 
+I look around and see a few stores in the distance. 
+%
+Maybe I can find a battery somewhere.
+/
+pass_them
+I steel myself as I prepare to run through the horde of zombies that stands between me and safety. 
+My heart races in my chest as I take a deep breath and sprint forward.
+
+The zombies are slow, but there are so many of them. 
+I dodge and weave, narrowly avoiding their grasping hands as they reach out for me. 
+But one of them gets lucky, grabbing hold of my arm and pulling me off balance.
+
+I stumble and fall, surrounded by the ravenous horde. 
+They close in on me, tearing at my flesh with their rotting teeth and clawing hands. 
+I fight back, swinging wildly and desperately trying to keep them at bay, but there are too many of them.
+
+As I feel my strength fading, I know that this is the end. 
+I close my eyes, hoping for a quick death, but the pain is unbearable. 
+The last thing I see is the horde of zombies, tearing me apart with a frenzied hunger.
 /
 1f
 The state of the mall looks as if it was abandoned in a hurry. There are still some items on the shelves, but most of
@@ -127,7 +157,7 @@ them are broken or damaged. All the shops are abandoned, and the only thing I ca
 Besides, I can't see any zombies around. It's like they all disappeared. I don't know if it's a good thing or not. If I
 want to keep going up in the mall, I must start being very careful.
 /
-2f
+2fe
 When I reach the second floor, the whole place looks even more abandoned than the first floor. There are no lights on,
 and the only thing I can see is the moonlight coming through the windows.
 
@@ -136,3 +166,48 @@ floor. I can't see any other way to go up, so I must fight them if I want to kee
 use a crowed control weapon. But, where do I find something like that?
 /
 3f
+The third floor of the shopping mall in a post-apocalyptic world presents a haunting scene of desolation and decay.
+Broken glass and fallen debris cover the tiled floor, remnants of a time long gone. The once vibrant storefronts now
+stand abandoned and boarded up, with their faded signs barely legible.
+
+Among the remaining establishments, I miraculously find what I was looking for. There are car parts scattered on the
+floor, likely from one that was on display before this incident. Among the wreckage of the car and the stores,
+%
+I found the battery I was looking for.
+/
+fix_car
+After finding the car battery in the mall, I rush back to the parking lot, my heart racing with excitement. 
+With trembling hands, I open the hood and connect the battery. 
+I turn the key and the engine roars to life, filling me with a sense of hope.
+
+I quickly gather my supplies and hop into the driver's seat. 
+The car lurches forward as I press the accelerator, and I navigate through the deserted city streets, my eyes scanning for any signs of danger.
+
+As I make my way out of the city, the sense of relief is palpable. 
+The sun begins to rise on the horizon, casting a warm glow across the landscape. 
+I turn on the radio and hear a faint signal. 
+
+It's a message from a group of survivors, broadcasting from a safe zone outside the city.
+
+With newfound hope, I press down on the accelerator and head towards the safety of the survivors' camp. 
+The road stretches out before me, full of promise and possibility. 
+%
+I feel like I might just survive this apocalypse after all.
+/
+mall
+At the end of the street, I find an already abandoned mall. I can see a few people inside, but I can't tell if they are
+alive or dead. At least, they don't seem to be moving.
+%
+This place is a dead end, but I might be able to find something useful here.
+/
+2f
+As I reached the second floor of the mall, I saw them. 
+A horde of zombies was gathered at the far end of the hallway, blocking my way to the stairs that led to the third floor. 
+They were growling and snarling, their eyes fixated on me as they shambled towards me.
+
+I knew I had to act fast if I wanted to get to the third floor and find a way out of this place. 
+I checked my backpack, but I didn't have any weapons that could take down so many zombies. 
+I needed something powerful, something that could create a path through the horde.
+%
+I am sure I can find something, maybe somewhere else.
+/
