@@ -33,8 +33,9 @@ STACK_TAR = stack
 PARSER_TAR = parser
 AST_TAR = ast
 CAT_TAR = cat
+RENAME_TAR = rename
 
-EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR) $(CAT_TAR)
+EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_TAR) $(CAT_TAR) $(RENAME_TAR)
 
 
 multi:
@@ -96,6 +97,14 @@ CAT_OBJ = $(patsubst %, $(BUILDDIR)/%, $(CAT_SRC:.c=.o))
 $(CAT_TAR): $(CAT_OBJ) $(MAIN_TARGET) 
 	@mkdir -p bin
 	$(CC) $(CAT_OBJ) -o bin/$(CAT_TAR) $(LIBS) $(CFLAGS) 
+
+
+RENAME_SRC = $(RENAME_TAR).c $(UTILS_TAR).c
+RENAME_OBJ = $(patsubst %, $(BUILDDIR)/%, $(RENAME_SRC:.c=.o))
+ 
+$(RENAME_TAR): $(RENAME_OBJ) $(MAIN_TARGET) 
+	@mkdir -p bin
+	$(CC) $(RENAME_OBJ) -o bin/$(RENAME_TAR) $(LIBS) $(CFLAGS) 
 ######
 
 
