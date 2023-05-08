@@ -41,7 +41,7 @@ void takeItem() {
             if (rename(source_path, dest_item_path) == 0) {
                 found_item = true;
                 printf("You took: %s\n", filename);
-                // Incrementa el user_rank según el item encontrado
+                // Increment user rank
                 if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {
                     user_rank = 1;
                 } else if (strcmp(filename, "flamethrower.item") == 0 && user_rank == 1) {
