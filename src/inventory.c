@@ -16,7 +16,7 @@ void inventory(void) {
 
     char dir_name[100]; // variable for the directory
     strcpy(dir_name,
-           "tests/testdirs/inventory/"); // directory where all .items will be
+           "story/inventory/"); // directory where all .items will be
     DIR *dir;                            // idk
     struct dirent *entry;                // idk
     Item *item;
@@ -41,7 +41,7 @@ void inventory(void) {
                 print("Usage: %s\n", item->usage);
                 free_item(item);
             }
-            strcpy(dir_name, "story/testdirs/inventory/");
+            strcpy(dir_name, "story/inventory/");
         }
     }
     closedir(dir);
