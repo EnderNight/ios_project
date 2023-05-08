@@ -83,14 +83,14 @@ Variable *create_variable(char *name, char *value) {
     return var;
 }
 
-void export(Shell *shell, char *name, char *value) {
+int export(Shell *shell, char *name, char *value) {
 
-    int ofm = 0;
     Variable *var;
 
     var = create_variable(name, value);
     if (var == NULL) {
         print_err("Export error: cannot create variable");
+        return 1;
     } else {
         if (shell->env->size == shell->env->num) {
             shell->env->size *= 2;
@@ -98,17 +98,15 @@ void export(Shell *shell, char *name, char *value) {
                 realloc(shell->env->list,
                         sizeof(Variable *) * (size_t)shell->env->size);
 
-            if (shell->env->list == NULL) {
-                perror("Export error:");
-                ofm = 1;
-            }
+            if (shell->env->list == NULL)
+                error("Export error:");
         }
 
-        if (!ofm) {
-            shell->env->list[shell->env->num] = var;
-            ++shell->env->num;
-        }
+        shell->env->list[shell->env->num] = var;
+        ++shell->env->num;
     }
+
+    return 0;
 }
 
 int init_env(Shell *shell) {
@@ -143,6 +141,9 @@ int init_env(Shell *shell) {
             // Init mulitline prompt
             export(shell, "MULTI_PROMPT", "> ");
 
+            // User rank
+            export(shell, "USER_RANK", "0");
+
             free(bin_path);
 
             return 0;
@@ -155,7 +156,7 @@ int init_env(Shell *shell) {
 int env(Shell *shell, int argc) {
 
     if (argc != 1) {
-        print_err("Env error: env can not take arguements");
+        print_err("Env error: env can not take arguements.\n");
         return 1;
     }
 
@@ -185,6 +186,12 @@ int find_variable(char *name, Variable **list, int num) {
         return -1;
 
     return i;
+}
+
+int change_variable_value(Shell *shell, char *new_value, int index) {
+
+    strcpy(shell->env->list[index]->value, new_value);
+    return 0;
 }
 
 /*
@@ -251,7 +258,7 @@ Shell *sh_init(void) {
 }
 
 // BUILTINS
-char *builtin_str[] = {"cd", "env", "exit"};
+char *builtin_str[] = {"cd", "env", "exit", "export"};
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
@@ -270,7 +277,20 @@ int sh_exit(Shell *shell, int argc, char **argv) {
     return terminate(shell);
 }
 
-int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit};
+int sh_export(Shell *shell, int argc, char **argv) {
+
+    if (argc == 3) {
+        int index;
+        if ((index = find_variable(argv[1], shell->env->list, shell->env->num)) != -1)
+            return change_variable_value(shell, argv[2], index);
+        return export(shell, argv[1], argv[2]);
+    }
+
+    print_err("Incorrect number of parameters. Usage: export <VAR_NAME> <VAR_VALUE>\n");
+    return 1;
+}
+
+int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit, &sh_export};
 
 int check_builtin(char *cmd) {
 
