@@ -93,14 +93,8 @@ void readScenario() {
 
     // Here is the logic for reading
     // We read character by character
-    // First, we check if the player has the right group
-    // Example : group 4 is required to read text, so we check if the player has
-    // the group 4 If not, we keep reading until the group is 4, or we see a /
-    // If there is no text with the group 4, we display nothing
-
-    // If we have the right group, we print taking into account special
-    // characters If we see a %, we change the color If we see a \n, we wait a
-    // bit If we see a /, we stop reading Normal read
+    // If we see a %, we change the color If we see a \n, we wait
+    // If we see a /, we stop reading
     while (read(file, &c, 1) == 1 && c != '/') {
         if (c == '%') {
             fflush(stdout);
@@ -172,14 +166,20 @@ int cd(int argc, char *argv[]) {
         
         // Before reading, we check the user's global rank
         // If he made a choice, check the directory he is in, and depending on it we decide if we print the story or not
-        // EXAMPLE : Kill_him we do not display text if the player goes back to it
+        
+        // kill_him does not display if user_rank == 2
+        // 2f, 1f does not display if user_rank == 3
+
     }
 
     // Check if the player has the right to access the directory
     // If not, print a small text
     // print("I can't do that !\n Maybe I'm missing something...\n")
     // The player can only access the directory if he has the right group
-    // We use the stat function to get the group id
+
+    // kill_him needs to have user_rank == 1
+    // 3f needs to have user_rank == 2
+    // fix_car needs to have user_rank == 3
 
     if (chdir(argv[1]) != 0) {
         change_color("red");
