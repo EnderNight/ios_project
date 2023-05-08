@@ -1,18 +1,18 @@
+#include <dirent.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 int user_rank = 0;
 
 void takeItem() {
-    const char* initial_path = "./";                // Path (cwd)
-    const char* dest_path = "story/inventory/";     // Path to inventory
+    const char *initial_path = "./";            // Path (cwd)
+    const char *dest_path = "story/inventory/"; // Path to inventory
 
-    DIR* dir;
-    struct dirent* entry;
+    DIR *dir;
+    struct dirent *entry;
     char filename[20];
     char source_path[100];
     char dest_item_path[100];
@@ -34,8 +34,10 @@ void takeItem() {
         if (strcmp(filename, "knife.item") == 0 ||
             strcmp(filename, "flamethrower.item") == 0 ||
             strcmp(filename, "car_battery.item") == 0) {
-            snprintf(source_path, sizeof(source_path), "%s%s", initial_path, filename);
-            snprintf(dest_item_path, sizeof(dest_item_path), "%s%s", dest_path, filename);
+            snprintf(source_path, sizeof(source_path), "%s%s", initial_path,
+                     filename);
+            snprintf(dest_item_path, sizeof(dest_item_path), "%s%s", dest_path,
+                     filename);
 
             // move the item to the inventory
             if (rename(source_path, dest_item_path) == 0) {
@@ -44,9 +46,11 @@ void takeItem() {
                 // Increment user rank
                 if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {
                     user_rank = 1;
-                } else if (strcmp(filename, "flamethrower.item") == 0 && user_rank == 1) {
+                } else if (strcmp(filename, "flamethrower.item") == 0 &&
+                           user_rank == 1) {
                     user_rank = 2;
-                } else if (strcmp(filename, "car_battery.item") == 0 && user_rank == 2) {
+                } else if (strcmp(filename, "car_battery.item") == 0 &&
+                           user_rank == 2) {
                     user_rank = 3;
                 }
             } else {

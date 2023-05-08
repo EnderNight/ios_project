@@ -1,9 +1,9 @@
 #include "utils.h"
 
-#include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 void whereami(void) {
     char cwd[1024];

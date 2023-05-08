@@ -52,21 +52,21 @@ int main(int argc, char **argv) {
                 sh_end(shell);
                 return 1;
             } else
-                    //We put the player inside the right directory
-                    //TODO : should be something else than /test
+                // We put the player inside the right directory
+                // TODO : should be something else than /test
 
-                    //Put the pointer at the top
-                    print("\033[H");
-                //Clear the shell screen
-                print("\033[2J");
+                // Put the pointer at the top
+                print("\033[H");
+            // Clear the shell screen
+            print("\033[2J");
 
-                //Going to the right directory, will display the story
-                chdir("story");
-                change_color("cyan");
-                print("When you are ready, go to the start directory!\n");
-                change_color("white");
-                sh_loop(shell, debug);
-            }
+            // Going to the right directory, will display the story
+            chdir("story");
+            change_color("cyan");
+            print("When you are ready, go to the start directory!\n");
+            change_color("white");
+            sh_loop(shell, debug);
+        }
 
         sh_end(shell);
         return 0;

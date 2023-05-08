@@ -109,6 +109,31 @@ int export(Shell *shell, char *name, char *value) {
     return 0;
 }
 
+int init_history(Shell *shell) {
+
+    int res1, res2,
+        hist_fd = open("story/.history", O_CREAT | O_TRUNC | O_WRONLY,
+                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    char *hist_path;
+
+    if (hist_fd == -1)
+        error("init_history: create .history");
+
+    close(hist_fd);
+
+    hist_path = realpath("story/.history", NULL);
+
+    if (hist_path == NULL)
+        error("init_history");
+
+    res1 = export(shell, "HISTORY", hist_path);
+    free(hist_path);
+
+    res2 = export(shell, "NUM_CMD", "0");
+
+    return res1 && res2;
+}
+
 int init_env(Shell *shell) {
 
     // Get absolute path of bin/ dir
@@ -143,6 +168,9 @@ int init_env(Shell *shell) {
 
             // User rank
             export(shell, "USER_RANK", "0");
+
+            // History
+            init_history(shell);
 
             free(bin_path);
 
@@ -192,6 +220,130 @@ int change_variable_value(Shell *shell, char *new_value, int index) {
 
     strcpy(shell->env->list[index]->value, new_value);
     return 0;
+}
+
+int history(Shell *shell) {
+
+    int num_cmd = 0, eof = 0, size = 1, i = 0, hist_fd,
+        hist_ind = find_variable("HISTORY", shell->env->list, shell->env->num),
+        cur_num_cmd_ind =
+            find_variable("NUM_CMD", shell->env->list, shell->env->num),
+        cur_num_cmd;
+    char *buf;
+    ssize_t ret_read;
+
+    if (hist_ind != -1 && cur_num_cmd_ind != -1) {
+
+        hist_fd = open(shell->env->list[hist_ind]->value, O_APPEND | O_RDONLY);
+        cur_num_cmd = atoi(shell->env->list[cur_num_cmd_ind]->value);
+        buf = malloc(sizeof(char));
+
+        if (buf == NULL)
+            error("history");
+
+        if (cur_num_cmd > 10) {
+            while (cur_num_cmd > 10 && (ret_read = read(hist_fd, buf, 1)) > 0) {
+                if (buf[0] == '\n')
+                    --cur_num_cmd;
+            }
+
+            if (ret_read == -1)
+                error("history");
+        }
+
+        while (!eof) {
+
+            while (num_cmd < 10 && (ret_read = read(hist_fd, buf + i, 1)) > 0) {
+
+                if (buf[i] == '\n') {
+                    ++i;
+
+                    buf = realloc(buf, sizeof(char) * (size_t)(i + 1));
+                    buf[i] = '\0';
+
+                    print("%d - %s", num_cmd, buf);
+
+                    free(buf);
+
+                    buf = malloc(sizeof(char));
+                    i = 0;
+                    size = 1;
+
+                    ++num_cmd;
+                }
+
+                else {
+                    ++i;
+
+                    if (i == size) {
+                        size *= 2;
+                        buf = realloc(buf, sizeof(char) * (size_t)size);
+                    }
+                }
+            }
+
+            if (num_cmd >= 10)
+                eof = 1;
+
+            if (ret_read == 0)
+                eof = 1;
+
+            if (ret_read == -1)
+                error("history");
+        }
+
+        close(hist_fd);
+        free(buf);
+    }
+
+    return 0;
+}
+
+int num_digits(int num) {
+
+    int res = 1;
+
+    while (num != 0) {
+        num /= 10;
+        ++res;
+    }
+
+    return res;
+}
+
+int save_history(Shell *shell, char *cmd) {
+
+    int hist_fd,
+        hist_ind = find_variable("HISTORY", shell->env->list, shell->env->num),
+        cur_num_cmd_ind =
+            find_variable("NUM_CMD", shell->env->list, shell->env->num),
+        cur_num_cmd;
+    char *buf;
+
+    if (hist_ind != -1 && cur_num_cmd_ind != -1) {
+
+        hist_fd = open(shell->env->list[hist_ind]->value, O_APPEND | O_WRONLY);
+        cur_num_cmd = atoi(shell->env->list[cur_num_cmd_ind]->value);
+
+        if (hist_fd != -1) {
+            if (write(hist_fd, cmd, strlen(cmd)) < (ssize_t)strlen(cmd)) {
+                error("save_history");
+            } else {
+                ++cur_num_cmd;
+
+                buf = malloc(sizeof(char) *
+                             (size_t)(num_digits(cur_num_cmd) + 1));
+                sprintf(buf, "%d", cur_num_cmd);
+
+                change_variable_value(shell, buf, cur_num_cmd_ind);
+                free(buf);
+            }
+        }
+        return 0;
+    }
+
+    print_err("HISTORY variable not found.\n");
+    return 1;
 }
 
 /*
@@ -258,7 +410,7 @@ Shell *sh_init(void) {
 }
 
 // BUILTINS
-char *builtin_str[] = {"cd", "env", "exit", "export"};
+char *builtin_str[] = {"cd", "env", "exit", "export", "history"};
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
@@ -281,16 +433,30 @@ int sh_export(Shell *shell, int argc, char **argv) {
 
     if (argc == 3) {
         int index;
-        if ((index = find_variable(argv[1], shell->env->list, shell->env->num)) != -1)
+        if ((index = find_variable(argv[1], shell->env->list,
+                                   shell->env->num)) != -1)
             return change_variable_value(shell, argv[2], index);
         return export(shell, argv[1], argv[2]);
     }
 
-    print_err("Incorrect number of parameters. Usage: export <VAR_NAME> <VAR_VALUE>\n");
+    print_err("Incorrect number of parameters. Usage: export <VAR_NAME> "
+              "<VAR_VALUE>\n");
     return 1;
 }
 
-int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit, &sh_export};
+int sh_history(Shell *shell, int argc, char **argv) {
+
+    if (argc == 1) {
+        UNUSED(argv);
+        return history(shell);
+    }
+
+    print_err("History does not take arguments. Usage: history\n");
+    return 1;
+}
+
+int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit,
+                                                &sh_export, &sh_history};
 
 int check_builtin(char *cmd) {
 
@@ -532,6 +698,8 @@ int sh_loop(Shell *shell, int debug) {
     while (shell->is_running) {
         print("%s", shell->env->list[1]->value);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
+
+            save_history(shell, command);
 
             if (debug) {
 

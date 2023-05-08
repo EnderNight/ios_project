@@ -109,6 +109,6 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 
 # Clean rule
 clean:
-	$(RM) -r $(BUILDDIR) $(MAIN_TARGET) bin
+	$(RM) -r $(BUILDDIR) $(MAIN_TARGET) bin story/.history
 
 .PHONY: clean all

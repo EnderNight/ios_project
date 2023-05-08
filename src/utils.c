@@ -68,7 +68,8 @@ int print(const char *format, ...) {
     return res;
 }
 
-//TODO : Make a print_delay function that prints a string with a delay between each character
+// TODO : Make a print_delay function that prints a string with a delay between
+// each character
 
 /*
  * Print @text to stderr.

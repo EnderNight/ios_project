@@ -25,7 +25,7 @@ void _ls(const char *dir, int op_a, int op_l) {
         if (!op_a && d->d_name[0] == '.')
             continue;
         if (d->d_type == DT_REG) {
-            //TODO : fix color change
+            // TODO : fix color change
             change_color("blue");
             printf("%s  ", d->d_name);
             change_color("white");
@@ -71,4 +71,3 @@ int main(int argc, const char *argv[]) {
     }
     return 0;
 }
-

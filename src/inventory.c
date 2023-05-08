@@ -17,8 +17,8 @@ void inventory(void) {
     char dir_name[100]; // variable for the directory
     strcpy(dir_name,
            "story/inventory/"); // directory where all .items will be
-    DIR *dir;                            // idk
-    struct dirent *entry;                // idk
+    DIR *dir;                   // idk
+    struct dirent *entry;       // idk
     Item *item;
     char *ext; // idk
 

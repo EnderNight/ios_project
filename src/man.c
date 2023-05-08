@@ -22,10 +22,10 @@ void readMan(char *path) {
 }
 
 int main(int argc, char *argv[]) {
-    char path [456];
-    getcwd(path,sizeof path);
+    char path[456];
+    getcwd(path, sizeof path);
 
-    char* p = strstr(path, "ios_project");
+    char *p = strstr(path, "ios_project");
     p[0] = 0;
     strcat(path, "ios_project/data/manuals/");
     change_color("magenta");
@@ -67,5 +67,4 @@ int main(int argc, char *argv[]) {
         write(STDOUT_FILENO, "What is this ?\n", strlen("What is this ?\n"));
         return 0;
     }
-
 }
