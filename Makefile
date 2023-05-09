@@ -20,7 +20,6 @@ LIBS =
 
 # Targets variables
 WHEREAMI_TAR = whereami
-INVENTORY_TAR = inventory
 LS_TAR = ls
 CD_TAR = cd
 MAN_TAR = man
@@ -45,7 +44,7 @@ multi:
 
 all: $(EXECUTABLES)
 ########## MAIN EXECUTABLE ########
-MAIN_TARGET_SRC = $(MAIN_TARGET).c $(SHELL_TAR).c $(UTILS_TAR).c $(CD_TAR).c $(INPUT_TAR).c $(TOKEN_TAR).c $(PARSER_TAR).c $(STACK_TAR).c $(AST_TAR).c
+MAIN_TARGET_SRC = $(MAIN_TARGET).c $(SHELL_TAR).c $(UTILS_TAR).c $(CD_TAR).c $(INPUT_TAR).c $(TOKEN_TAR).c $(PARSER_TAR).c $(STACK_TAR).c $(AST_TAR).c $(ITEM_TAR).c
 MAIN_TARGET_OBJ = $(patsubst %, $(BUILDDIR)/%, $(MAIN_TARGET_SRC:.c=.o))
 
 $(MAIN_TARGET): $(MAIN_TARGET_OBJ)
@@ -61,16 +60,6 @@ WHEREAMI_OBJ = $(patsubst %, $(BUILDDIR)/%, $(WHEREAMI_SRC:.c=.o))
 $(WHEREAMI_TAR): $(WHEREAMI_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
 	$(CC) $(WHEREAMI_OBJ) -o bin/$(WHEREAMI_TAR) $(LIBS) $(CFLAGS)
-
-
-
-INVENTORY_SRC = $(INVENTORY_TAR).c $(ITEM_TAR).c $(UTILS_TAR).c
-INVENTORY_OBJ = $(patsubst %, $(BUILDDIR)/%, $(INVENTORY_SRC:.c=.o))
-
-$(INVENTORY_TAR): $(INVENTORY_OBJ) $(MAIN_TARGET)
-	@mkdir -p bin
-	$(CC) $(INVENTORY_OBJ) -o bin/$(INVENTORY_TAR) $(LIBS) $(CFLAGS)
-
 
 
 LS_SRC = $(LS_TAR).c $(UTILS_TAR).c

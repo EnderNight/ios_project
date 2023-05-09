@@ -7,6 +7,7 @@
 #include "utils.h"
 
 #include "cd.h"
+#include "item.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -16,8 +17,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+#include <sys/wait.h> // waitpid
 #include <unistd.h>
+#include <stdbool.h>
+#include <sys/stat.h>
 
 #define PROMPT "Outside> "
 #define BINDIR "bin"
@@ -134,6 +137,22 @@ int init_history(Shell *shell) {
     return res1 && res2;
 }
 
+int init_inventory(Shell *shell) {
+
+    int res;
+    char *inv_path;
+
+    inv_path = realpath("game_directories/inventory", NULL);
+
+    if (inv_path == NULL)
+    error("init_inventory");
+
+    res = export(shell, "INVENTORY", inv_path);
+    free(inv_path);
+
+    return res;
+}
+
 int init_env(Shell *shell) {
 
     // Get absolute path of bin/ dir
@@ -171,6 +190,9 @@ int init_env(Shell *shell) {
 
             // History
             init_history(shell);
+
+            // Inventory
+            init_inventory(shell);
 
             free(bin_path);
 
@@ -233,48 +255,35 @@ int history(Shell *shell) {
     ssize_t ret_read;
 
     if (hist_ind != -1 && cur_num_cmd_ind != -1) {
-
         hist_fd = open(shell->env->list[hist_ind]->value, O_APPEND | O_RDONLY);
         cur_num_cmd = atoi(shell->env->list[cur_num_cmd_ind]->value);
         buf = malloc(sizeof(char));
-
         if (buf == NULL)
             error("history");
-
         if (cur_num_cmd > 10) {
             while (cur_num_cmd > 10 && (ret_read = read(hist_fd, buf, 1)) > 0) {
                 if (buf[0] == '\n')
                     --cur_num_cmd;
             }
-
             if (ret_read == -1)
                 error("history");
         }
-
         while (!eof) {
-
             while (num_cmd < 10 && (ret_read = read(hist_fd, buf + i, 1)) > 0) {
-
                 if (buf[i] == '\n') {
                     ++i;
-
                     buf = realloc(buf, sizeof(char) * (size_t)(i + 1));
                     buf[i] = '\0';
-
                     print("%d - %s", num_cmd, buf);
-
                     free(buf);
-
                     buf = malloc(sizeof(char));
                     i = 0;
                     size = 1;
-
                     ++num_cmd;
                 }
 
                 else {
                     ++i;
-
                     if (i == size) {
                         size *= 2;
                         buf = realloc(buf, sizeof(char) * (size_t)size);
@@ -284,10 +293,8 @@ int history(Shell *shell) {
 
             if (num_cmd >= 10)
                 eof = 1;
-
             if (ret_read == 0)
                 eof = 1;
-
             if (ret_read == -1)
                 error("history");
         }
@@ -296,6 +303,138 @@ int history(Shell *shell) {
         free(buf);
     }
 
+    return 0;
+}
+
+int take(Shell *shell) {
+    int user_rank_index = find_variable("USER_RANK", shell->env->list, shell->env->num);
+    int user_rank = atoi(shell->env->list[user_rank_index]->value);
+
+    fprintf(stderr, "user_rank: %d\n", user_rank);
+
+    char initial_path[200];
+    if (getcwd(initial_path, sizeof(initial_path)) != NULL) {
+        char *dir_name = strrchr(initial_path, '/');
+        change_color("cyan");
+        print("I am in : %s\n", dir_name ? dir_name + 1 : initial_path);
+        change_color("white");
+    } else {
+        perror("getcwd() error");
+    }
+
+    fprintf(stderr, "initial_path: %s\n", initial_path);
+
+    int inv_index = find_variable("INVENTORY", shell->env->list, shell->env->num);
+    char* dest_path = shell->env->list[inv_index]->value;
+
+    DIR *dir;
+    struct dirent *entry;
+    char filename[20];
+    char source_path[150];
+    char final_path[150];
+
+    // open initial path
+    dir = opendir(initial_path);
+    if (dir == NULL) {
+        fprintf(stderr, "Error opening the initial path\n");
+        return -1;
+    }
+
+    bool found_item = false;
+
+    // iterate over the files in the directory
+    while ((entry = readdir(dir)) != NULL) {
+        strcpy(filename, entry->d_name);
+
+        // check if the file is an item
+        if (strcmp(filename, "knife.item") == 0 ||
+            strcmp(filename, "flamethrower.item") == 0 ||
+            strcmp(filename, "car_battery.item") == 0) {
+            snprintf(source_path, sizeof(source_path), "%s/%s", initial_path, filename);
+            snprintf(final_path, sizeof(final_path), "%s/%s", dest_path, filename);
+
+            // move the item to the inventory
+
+            int link_res, unlink_res;
+            struct stat sb1;
+
+            fprintf(stderr, "source_path: %s\n", source_path); //variable check
+            fprintf(stderr, "dest_item_path: %s\n", final_path); //variable check
+
+            if (stat(source_path, &sb1) == -1) {
+                perror("couldn't get source_path stat");
+                return 1;
+            }
+
+            if (S_ISREG(sb1.st_mode)) {
+                link_res = link(source_path, final_path);
+                if (link_res == -1) {
+                    perror("couldn't link");
+                    return 1;
+                }
+
+                unlink_res = unlink(source_path);
+                if (unlink_res == -1) {
+                    perror("couldn't unlink");
+                    return 1;
+                }
+                return 0;
+            }
+
+            found_item = true;
+            printf("You took: %s\n", filename);
+
+            // Increment user rank
+            if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {user_rank = 1;
+            } else if (strcmp(filename, "flamethrower.item") == 0 && user_rank == 1) {
+                user_rank = 2;
+            } else if (strcmp(filename, "car_battery.item") == 0 && user_rank == 2) {
+                user_rank = 3;
+            }
+        }
+    }
+
+    closedir(dir);
+
+    // if no items were found
+    if (!found_item) {
+        printf("There is nothing here.\n");
+    }
+    return 0;
+}
+
+int inventory(Shell *shell){
+
+    int inv_index = find_variable("INVENTORY", shell->env->list, shell->env->num);
+    char* dir_name = shell->env->list[inv_index]->value;
+
+    DIR *dir;                   // idk
+    struct dirent *entry;       // idk
+    Item *item;
+    char *ext; // idk
+
+    if ((dir = opendir(dir_name)) == NULL) {
+        perror("opendir error");
+        return -1;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if ((ext = strstr(entry->d_name, ".item")) !=
+            NULL) { // looks for a sub-string inside a string
+
+            strcat(dir_name, entry->d_name);
+
+            item = load_item(dir_name);
+
+            if (item != NULL) {
+                print("Name: %s\n", item->name);
+                print("Desc: %s\n", item->desc);
+                print("Usage: %s\n", item->usage);
+                free_item(item);
+            }
+        }
+    }
+    closedir(dir);
     return 0;
 }
 
@@ -410,7 +549,7 @@ Shell *sh_init(void) {
 }
 
 // BUILTINS
-char *builtin_str[] = {"cd", "env", "exit", "export", "history"};
+char *builtin_str[] = {"cd", "env", "exit", "export", "history", "take", "inventory"};
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
@@ -455,8 +594,30 @@ int sh_history(Shell *shell, int argc, char **argv) {
     return 1;
 }
 
+int sh_take(Shell *shell, int argc, char **argv) {
+
+    if (argc == 1) {
+        UNUSED(argv);
+        return take(shell);
+    }
+
+    print_err("take doesnt have items. Usage: take\n");
+    return 1;
+}
+
+int sh_inventory(Shell *shell, int argc, char **argv) {
+
+    if (argc == 1) {
+        UNUSED(argv);
+        return inventory(shell);
+    }
+
+    print_err("inventory error\n");
+    return 1;
+}
+
 int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit,
-                                                &sh_export, &sh_history};
+                                                &sh_export, &sh_history, &sh_take, &sh_inventory};
 
 int check_builtin(char *cmd) {
 
@@ -557,6 +718,8 @@ char *read_cmd(Shell *shell, int *res) {
     *res = (int)ret;
     return cmd;
 }
+
+
 
 int execute(Shell *shell, int argc, char *argv[], int p[2], int end) {
 
