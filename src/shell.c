@@ -60,25 +60,22 @@ Variable *create_variable(char *name, char *value) {
 
     Variable *var = NULL;
 
-    if (strlen(name) <= VAR_NAME_MAX_LENGTH &&
-        strlen(value) <= VAR_VALUE_MAX_LENGTH) {
-        var = malloc(sizeof(Variable));
-        if (var == NULL) {
-            perror("Create variable");
+    var = malloc(sizeof(Variable));
+    if (var == NULL) {
+        perror("Create variable");
+    } else {
+        var->name = malloc(sizeof(char) * strlen(name) + 1);
+        if (var->name == NULL) {
+            perror("Create variable name");
+            var = NULL;
         } else {
-            var->name = malloc(sizeof(char) * VAR_NAME_MAX_LENGTH + 1);
-            if (var->name == NULL) {
-                perror("Create variable name");
+            var->value = malloc(sizeof(char) * strlen(value) + 1);
+            if (var->value == NULL) {
+                perror("Create variable value");
                 var = NULL;
             } else {
-                var->value = malloc(sizeof(char) * VAR_VALUE_MAX_LENGTH + 1);
-                if (var->value == NULL) {
-                    perror("Create variable value");
-                    var = NULL;
-                } else {
-                    strcpy(var->name, name);
-                    strcpy(var->value, value);
-                }
+                strcpy(var->name, name);
+                strcpy(var->value, value);
             }
         }
     }
@@ -93,7 +90,7 @@ int export(Shell *shell, char *name, char *value) {
     var = create_variable(name, value);
     if (var == NULL) {
         print_err("Export error: cannot create variable");
-        return 1;
+        return 0;
     } else {
         if (shell->env->size == shell->env->num) {
             shell->env->size *= 2;
@@ -109,7 +106,7 @@ int export(Shell *shell, char *name, char *value) {
         ++shell->env->num;
     }
 
-    return 0;
+    return 1;
 }
 
 int init_history(Shell *shell) {
@@ -167,11 +164,11 @@ int init_env(Shell *shell) {
     // Init env
     shell->env = malloc(sizeof(ENV));
     if (shell->env == NULL) {
-        perror("Init env");
+        error("Init env");
     } else {
-        shell->env->list = malloc(sizeof(Variable *) * 1);
+        shell->env->list = malloc(sizeof(Variable *));
         if (shell->env->list == NULL) {
-            perror("Init env");
+            error("Init env");
         } else {
             shell->env->num = 0;
             shell->env->size = 1;
@@ -240,7 +237,10 @@ int find_variable(char *name, Variable **list, int num) {
 
 int change_variable_value(Shell *shell, char *new_value, int index) {
 
+    shell->env->list[index]->value =
+        realloc(shell->env->list[index]->value, strlen(new_value) + 1);
     strcpy(shell->env->list[index]->value, new_value);
+
     return 0;
 }
 
@@ -291,9 +291,7 @@ int history(Shell *shell) {
                 }
             }
 
-            if (num_cmd >= 10)
-                eof = 1;
-            if (ret_read == 0)
+            if (num_cmd >= 10 || ret_read == 0)
                 eof = 1;
             if (ret_read == -1)
                 error("history");
@@ -635,6 +633,7 @@ int check_builtin(char *cmd) {
 int check_ast(Shell *shell, AST *ast, int *num_cmd) {
 
     char *cmd;
+    int res;
 
     if (ast->token->type == TOKEN_CMD) {
         if ((cmd = find_command(shell, ast->token->command[0])) != NULL ||
@@ -649,6 +648,14 @@ int check_ast(Shell *shell, AST *ast, int *num_cmd) {
 
     if (ast->token->type == TOKEN_REDIR)
         return check_ast(shell, ast->children[1], num_cmd);
+
+    if (ast->token->type == TOKEN_AMPER) {
+        res = check_ast(shell, ast->children[0], num_cmd);
+        if (ast->num_children > 1) {
+            res &= check_ast(shell, ast->children[0], num_cmd);
+        }
+        return res;
+    }
 
     return check_ast(shell, ast->children[0], num_cmd) &&
            check_ast(shell, ast->children[1], num_cmd);
@@ -829,6 +836,37 @@ int executor(AST *ast, Shell *shell, int init_in, int init_out, int fdin,
 
 int init_executor(AST *ast, Shell *shell, int num_cmd) {
 
+    if (ast->token->type == TOKEN_AMPER || ast->token->type == TOKEN_SEMI) {
+
+        pid_t child = fork();
+        int i = num_cmd, status;
+
+        if (child == 0) {
+            num_cmd = 0;
+            check_ast(shell, ast->children[0], &num_cmd);
+
+            exit(init_executor(ast->children[0], shell, num_cmd));
+        } else if (child == -1) {
+            error("init_executor");
+        } else {
+            if (ast->token->type == TOKEN_SEMI) {
+                while (i > 0) {
+                    wait(&status);
+                    --i;
+                }
+                if (ast->num_children != 2)
+                    return status;
+            }
+
+            if (ast->num_children == 2) {
+                num_cmd = 0;
+                ast = ast->children[1];
+                check_ast(shell, ast, &num_cmd);
+                return init_executor(ast, shell, num_cmd);
+            }
+        }
+    }
+
     int tmpin, tmpout, num = 0, status;
 
     tmpin = dup(STDIN_FILENO);
@@ -856,7 +894,8 @@ int sh_loop(Shell *shell, int debug) {
     char *command = NULL;
     int res, num_cmd = 0;
     Input *in;
-    Tokens *tokens, *rpn_tokens;
+    Tokens *tokens;
+    Cmd *rpn_tokens;
     AST *ast;
 
     while (shell->is_running) {
@@ -879,8 +918,8 @@ int sh_loop(Shell *shell, int debug) {
 
                     print("\nRPN\n");
                     rpn_tokens = to_rpn(tokens);
+                    print_cmd(rpn_tokens);
                     if (check_rpn(rpn_tokens)) {
-                        print_tokens(rpn_tokens);
 
                         print("\nAST\n");
                         ast = rpn_to_ast(rpn_tokens);
@@ -895,7 +934,7 @@ int sh_loop(Shell *shell, int debug) {
                     } else
                         print_err("Error: invalid command.\n");
 
-                    free_tokens(rpn_tokens);
+                    free_cmd(rpn_tokens);
                     free_tokens(tokens);
                 }
                 free_input(in);
@@ -921,7 +960,7 @@ int sh_loop(Shell *shell, int debug) {
                     } else
                         print_err("Semantic error: invalid command.\n");
 
-                    free_tokens(rpn_tokens);
+                    free_cmd(rpn_tokens);
                     free_tokens(tokens);
                 }
 
