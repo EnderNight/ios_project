@@ -142,7 +142,7 @@ int init_inventory(Shell *shell) {
     int res;
     char *inv_path;
 
-    inv_path = realpath("game_directories/inventory", NULL);
+    inv_path = realpath("game_directories/inventory/", NULL);
 
     if (inv_path == NULL)
     error("init_inventory");
@@ -358,8 +358,8 @@ int take(Shell *shell) {
             int link_res, unlink_res;
             struct stat sb1;
 
-            fprintf(stderr, "source_path: %s\n", source_path); //variable check
-            fprintf(stderr, "dest_item_path: %s\n", final_path); //variable check
+            //fprintf(stderr, "source_path: %s\n", source_path); //variable check
+            //fprintf(stderr, "dest_item_path: %s\n", final_path); //variable check
 
             if (stat(source_path, &sb1) == -1) {
                 perror("couldn't get source_path stat");
@@ -378,7 +378,6 @@ int take(Shell *shell) {
                     perror("couldn't unlink");
                     return 1;
                 }
-                return 0;
             }
 
             found_item = true;
@@ -408,10 +407,11 @@ int inventory(Shell *shell){
     int inv_index = find_variable("INVENTORY", shell->env->list, shell->env->num);
     char* dir_name = shell->env->list[inv_index]->value;
 
-    DIR *dir;                   // idk
-    struct dirent *entry;       // idk
+    DIR *dir;
+    struct dirent *entry;
     Item *item;
-    char *ext; // idk
+    char *ext;
+    char item_path[100];
 
     if ((dir = opendir(dir_name)) == NULL) {
         perror("opendir error");
@@ -422,9 +422,10 @@ int inventory(Shell *shell){
         if ((ext = strstr(entry->d_name, ".item")) !=
             NULL) { // looks for a sub-string inside a string
 
-            strcat(dir_name, entry->d_name);
+            //strcat(dir_name, entry->d_name);
+            snprintf(item_path, sizeof(item_path), "%s/%s", dir_name, entry->d_name);
 
-            item = load_item(dir_name);
+            item = load_item(item_path);
 
             if (item != NULL) {
                 print("Name: %s\n", item->name);
