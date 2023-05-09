@@ -1,14 +1,15 @@
 #include "utils.h"
 
 #include <stdio.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 int main(int argc, char **argv) {
 
     if (argc != 3) {
-        print_err("Incorrect number of arguments for rename. Usage: mv <old_name> <new_name>\n");
+        print_err("Incorrect number of arguments for rename. Usage: mv "
+                  "<old_name> <new_name>\n");
         return 1;
     }
 

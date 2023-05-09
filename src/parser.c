@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-Tokens *to_rpn(Tokens *infix_tok) {
+Tokens *_to_rpn(Tokens *infix_tok) {
 
     Tokens *rpn_tok = malloc(sizeof(Tokens));
     Stack_ele *temp;
@@ -49,9 +49,56 @@ Tokens *to_rpn(Tokens *infix_tok) {
     return rpn_tok;
 }
 
-int check_rpn(Tokens *rpn_tokens) {
+Cmd *to_rpn(Tokens *infix_tok) {
 
-    int size = 0, i = 0, err = 0;
+    Cmd *res = malloc(sizeof(Cmd));
+    int len = 1, is_end = 0;
+    Tokens *tmp = malloc(sizeof(Tokens));
+
+    res->tokens = malloc(sizeof(Tokens *));
+    tmp->token_list = malloc(sizeof(Token *) * (size_t)infix_tok->num);
+    tmp->num = 0;
+
+    for (int i = 0; i < infix_tok->num; ++i) {
+
+        if (is_end)
+            is_end = 0;
+
+        if (infix_tok->token_list[i]->type == TOKEN_AMPER ||
+            infix_tok->token_list[i]->type == TOKEN_SEMI) {
+            tmp->token_list[tmp->num] = copy_token(infix_tok->token_list[i]);
+            ++tmp->num;
+
+            res->tokens[len - 1] = _to_rpn(tmp);
+            ++len;
+            res->tokens = realloc(res->tokens, sizeof(Tokens *) * (size_t)len);
+
+            free_tokens(tmp);
+            tmp = malloc(sizeof(Tokens));
+            tmp->token_list = malloc(sizeof(Token *) * (size_t)infix_tok->num);
+            tmp->num = 0;
+
+            is_end = 1;
+        } else {
+            tmp->token_list[tmp->num] = copy_token(infix_tok->token_list[i]);
+            ++tmp->num;
+        }
+    }
+
+    if (!is_end)
+        res->tokens[len - 1] = _to_rpn(tmp);
+    else
+        --len;
+
+    res->len = len;
+    free_tokens(tmp);
+
+    return res;
+}
+
+int _check_rpn(Tokens *rpn_tokens) {
+
+    int size = 0, err = 0, i = 0;
 
     while (i < rpn_tokens->num && !err) {
         size += 1 - rpn_tokens->token_list[i]->valence;
@@ -66,7 +113,18 @@ int check_rpn(Tokens *rpn_tokens) {
     return 1;
 }
 
-AST *rpn_to_ast(Tokens *rpn_tokens) {
+int check_rpn(Cmd *rpn_tokens) {
+
+    int i = 0;
+
+    while (i < rpn_tokens->len && _check_rpn(rpn_tokens->tokens[i])) {
+        ++i;
+    }
+
+    return i == rpn_tokens->len;
+}
+
+AST *_rpn_to_ast(Tokens *rpn_tokens) {
 
     AST *ast = NULL;
     Stack *stack = create_stack();
@@ -88,9 +146,12 @@ AST *rpn_to_ast(Tokens *rpn_tokens) {
             add_children(ast, temp->ast);
             free(temp);
 
-            temp = pull(stack);
-            add_children(ast, temp->ast);
-            free(temp);
+            if (rpn_tokens->token_list[i]->type != TOKEN_AMPER &&
+                rpn_tokens->token_list[i]->type != TOKEN_SEMI) {
+                temp = pull(stack);
+                add_children(ast, temp->ast);
+                free(temp);
+            }
 
             push_ast(stack, ast);
 
@@ -106,4 +167,19 @@ AST *rpn_to_ast(Tokens *rpn_tokens) {
 
     free_stack(stack);
     return ast;
+}
+
+AST *rpn_to_ast(Cmd *rpn_tokens) {
+
+    int i = rpn_tokens->len - 2;
+    AST *res = _rpn_to_ast(rpn_tokens->tokens[rpn_tokens->len - 1]), *tmp;
+
+    while (i >= 0) {
+        tmp = _rpn_to_ast(rpn_tokens->tokens[i]);
+        add_children(tmp, res);
+        res = tmp;
+        --i;
+    }
+
+    return res;
 }

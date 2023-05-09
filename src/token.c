@@ -24,8 +24,16 @@ Token *create_token(Input *in, int from, int to, Type type) {
     }
 
     tok->len = len;
+    tok->assoc = LEFT;
 
-    tok->valence = tok->type == TOKEN_CMD ? 0 : 2;
+    if (tok->type == TOKEN_CMD) {
+        tok->valence = 0;
+    } else if (tok->type == TOKEN_AMPER || tok->type == TOKEN_SEMI) {
+        tok->valence = 1;
+        tok->assoc = RIGHT;
+    } else {
+        tok->valence = 2;
+    }
 
     return tok;
 }
@@ -48,6 +56,16 @@ void free_tokens(Tokens *tokens) {
 
     free(tokens->token_list);
     free(tokens);
+}
+
+void free_cmd(Cmd *cmd) {
+
+    for (int i = 0; i < cmd->len; ++i) {
+        free_tokens(cmd->tokens[i]);
+    }
+
+    free(cmd->tokens);
+    free(cmd);
 }
 
 void add_cmd_token(int *i, int *cmd_index, int *tok_index, Tokens *tokens,
@@ -135,4 +153,9 @@ void print_tokens(Tokens *tokens) {
               tokens->token_list[j]->command[tokens->token_list[j]->len - 1],
               tokens->token_list[j]->type, tokens->token_list[j]->valence);
     }
+}
+
+void print_cmd(Cmd *cmd) {
+    for (int i = 0; i < cmd->len; ++i)
+        print_tokens(cmd->tokens[i]);
 }
