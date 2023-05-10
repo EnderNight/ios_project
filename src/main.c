@@ -46,10 +46,21 @@ int main(int argc, char **argv) {
             // Clear the shell screen
             print("\033[2J");
 
-            
+
             // Going to the right directory, will display the story
             chdir("story");
+            change_color("magenta");
+            print("   ('-.      _ (`-.                           ('-.                             _ (`-.   .-')      ('-.   \n");
+            print("  ( OO ).-. ( (OO  )                         ( OO ).-.                        ( (OO  ) ( OO ).  _(  OO)  \n");
+            print("  / . --. /_.`     \\ .-'),-----.    .-----.  / . --. / ,--.       ,--.   ,--._.`     \\(_)---\\_)(,------. \n");
+            print("  | \\-.  \\(__...--''( OO'  .-.  '  '  .--./  | \\-.  \\  |  |.-')    \\  `.'  /(__...--''/    _ |  |  .---' \n");
+            print(".-'-'  |  ||  /  | |/   |  | |  |  |  |('-..-'-'  |  | |  | OO ) .-')     /  |  /  | |\\  :` `.  |  |     \n");
+            print(" \\| |_.'  ||  |_.' |\\_) |  |\\|  | /_) |OO  )\\| |_.'  | |  |`-' |(OO  \\   /   |  |_.' | '..`''.)(|  '--.  \n");
+            print("  |  .-.  ||  .___.'  \\ |  | |  | ||  |`-'|  |  .-.  |(|  '---.' |   /  /\\_  |  .___.'.-._)   \\ |  .--'  \n");
+            print("  |  | |  ||  |        `'  '-'  '(_'  '--'\\  |  | |  | |      |  `-./  /.__) |  |     \\       / |  `---. \n");
+            print("  `--' `--'`--'          `-----'    `-----'  `--' `--' `------'    `--'      `--'      `-----'  `------' \n\n");
             change_color("cyan");
+            sleep(1);
             print("When you are ready, go to the start directory!\n");
             change_color("white");
             sh_loop(shell, debug);

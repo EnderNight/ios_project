@@ -36,55 +36,55 @@ void readScenario() {
         lseek(file, 6, SEEK_SET);
     }
     if (strcmp(directory, "roundabout") == 0) {
-        lseek(file, 452, SEEK_SET);
+        lseek(file, 453, SEEK_SET);
     }
     if (strcmp(directory, "friends_house") == 0) {
-        lseek(file, 1130, SEEK_SET);
+        lseek(file, 1131, SEEK_SET);
     }
     if (strcmp(directory, "living_room") == 0) {
-        lseek(file, 4156, SEEK_SET);
+        lseek(file, 4157, SEEK_SET);
     }
     if (strcmp(directory, "bedroom") == 0) {
-        lseek(file, 2011, SEEK_SET);
+        lseek(file, 2012, SEEK_SET);
     }
     if (strcmp(directory, "do_nothing") == 0) {
-        lseek(file, 2983, SEEK_SET);
+        lseek(file, 2984, SEEK_SET);
     }
     if (strcmp(directory, "kitchen") == 0) {
-        lseek(file, 4886, SEEK_SET);
+        lseek(file, 4887, SEEK_SET);
     }
     if (strcmp(directory, "kill_him") == 0) {
-        lseek(file, 5391, SEEK_SET);
+        lseek(file, 5392, SEEK_SET);
     }
     if (strcmp(directory, "talk") == 0) {
-        lseek(file, 3155, SEEK_SET);
+        lseek(file, 3156, SEEK_SET);
     }
     if (strcmp(directory, "investigate") == 0) {
-        lseek(file, 6109, SEEK_SET);
+        lseek(file, 6110, SEEK_SET);
     }
     if (strcmp(directory, "parking") == 0) {
-        lseek(file, 6910, SEEK_SET);
+        lseek(file, 6911, SEEK_SET);
     }
     if (strcmp(directory, "mall") == 0) {
-        lseek(file, 11245, SEEK_SET);
+        lseek(file, 11246, SEEK_SET);
     }
     if (strcmp(directory, "1f") == 0) {
-        lseek(file, 8732, SEEK_SET);
+        lseek(file, 8733, SEEK_SET);
     }
     if (strcmp(directory, "2f") == 0) {
-        lseek(file, 11504, SEEK_SET);
+        lseek(file, 11505, SEEK_SET);
     }
     if (strcmp(directory, "3f") == 0) {
-        lseek(file, 9672, SEEK_SET);
+        lseek(file, 9673, SEEK_SET);
     }
     if (strcmp(directory, "car") == 0) {
-        lseek(file, 7278, SEEK_SET);
+        lseek(file, 7279, SEEK_SET);
     }
     if (strcmp(directory, "fix_car") == 0) {
-        lseek(file, 10256, SEEK_SET);
+        lseek(file, 10257, SEEK_SET);
     }
     if (strcmp(directory, "pass_them") == 0) {
-        lseek(file, 7868, SEEK_SET);
+        lseek(file, 7869, SEEK_SET);
     }
     // ADD OTHER DIRECTORIES HERE
 
@@ -107,8 +107,8 @@ void readScenario() {
             // If there is a newline, we wait
             if (c == '\n')
                 // TODO : change this line when tests are gooood
-                sleep(0);
-            usleep(0);
+                sleep(1);
+            usleep(9000);
         }
     }
 
@@ -182,6 +182,7 @@ int cd(int argc, char *argv[]) {
     // Here, the access to the directory is a success
     // So we display the story with lseek depending on the directory
     // We implement it this way just to use lseek
+    print("\n");
     readScenario();
 
     return 0;
