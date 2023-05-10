@@ -839,6 +839,11 @@ char *read_cmd(Shell *shell, int *res) {
         break;
     }
 
+    if (cmd[0] == '\0') {
+        free(cmd);
+        cmd = NULL;
+    }
+
     *res = (int)ret;
     return cmd;
 }
