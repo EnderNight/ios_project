@@ -12,15 +12,15 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h> // waitpid
 #include <unistd.h>
-#include <stdbool.h>
-#include <sys/stat.h>
 
 #define PROMPT "Outside> "
 #define BINDIR "bin"
@@ -64,12 +64,12 @@ Variable *create_variable(char *name, char *value) {
     if (var == NULL) {
         perror("Create variable");
     } else {
-        var->name = malloc(sizeof(char) * strlen(name) + 1);
+        var->name = malloc(sizeof(char) * (strlen(name) + 1));
         if (var->name == NULL) {
             perror("Create variable name");
             var = NULL;
         } else {
-            var->value = malloc(sizeof(char) * strlen(value) + 1);
+            var->value = malloc(sizeof(char) * (strlen(value) + 1));
             if (var->value == NULL) {
                 perror("Create variable value");
                 var = NULL;
@@ -139,10 +139,10 @@ int init_inventory(Shell *shell) {
     int res;
     char *inv_path;
 
-    inv_path = realpath("game_directories/inventory/", NULL);
+    inv_path = realpath("game_directories/inventory", NULL);
 
     if (inv_path == NULL)
-    error("init_inventory");
+        error("init_inventory");
 
     res = export(shell, "INVENTORY", inv_path);
     free(inv_path);
@@ -305,31 +305,31 @@ int history(Shell *shell) {
 }
 
 int take(Shell *shell) {
-    int user_rank_index = find_variable("USER_RANK", shell->env->list, shell->env->num);
+    int user_rank_index =
+        find_variable("USER_RANK", shell->env->list, shell->env->num);
     int user_rank = atoi(shell->env->list[user_rank_index]->value);
 
     fprintf(stderr, "user_rank: %d\n", user_rank);
 
-    char initial_path[200];
-    if (getcwd(initial_path, sizeof(initial_path)) != NULL) {
+    char *initial_path;
+    if ((initial_path = getcwd(NULL, 0)) != NULL) {
         char *dir_name = strrchr(initial_path, '/');
         change_color("cyan");
         print("I am in : %s\n", dir_name ? dir_name + 1 : initial_path);
         change_color("white");
     } else {
-        perror("getcwd() error");
+        error("getcwd() error");
     }
 
     fprintf(stderr, "initial_path: %s\n", initial_path);
 
-    int inv_index = find_variable("INVENTORY", shell->env->list, shell->env->num);
-    char* dest_path = shell->env->list[inv_index]->value;
+    int inv_index =
+        find_variable("INVENTORY", shell->env->list, shell->env->num);
+    char *dest_path = shell->env->list[inv_index]->value;
 
     DIR *dir;
     struct dirent *entry;
-    char filename[20];
-    char source_path[150];
-    char final_path[150];
+    char *filename, *source_path, *final_path;
 
     // open initial path
     dir = opendir(initial_path);
@@ -342,22 +342,36 @@ int take(Shell *shell) {
 
     // iterate over the files in the directory
     while ((entry = readdir(dir)) != NULL) {
+        filename = malloc(sizeof(char) * (strlen(entry->d_name) + 1));
         strcpy(filename, entry->d_name);
 
         // check if the file is an item
         if (strcmp(filename, "knife.item") == 0 ||
             strcmp(filename, "flamethrower.item") == 0 ||
             strcmp(filename, "car_battery.item") == 0) {
-            snprintf(source_path, sizeof(source_path), "%s/%s", initial_path, filename);
-            snprintf(final_path, sizeof(final_path), "%s/%s", dest_path, filename);
+
+            source_path = malloc(sizeof(char) *
+                                 (strlen(initial_path) + strlen(filename) + 2));
+            final_path = malloc(sizeof(char) *
+                                (strlen(dest_path) + strlen(filename) + 2));
+
+            strcpy(source_path, initial_path);
+            strcpy(final_path, dest_path);
+
+            strcat(source_path, "/");
+            strcat(source_path, filename);
+
+            strcat(final_path, "/");
+            strcat(final_path, filename);
 
             // move the item to the inventory
 
             int link_res, unlink_res;
             struct stat sb1;
 
-            //fprintf(stderr, "source_path: %s\n", source_path); //variable check
-            //fprintf(stderr, "dest_item_path: %s\n", final_path); //variable check
+            // fprintf(stderr, "source_path: %s\n", source_path); //variable
+            // check fprintf(stderr, "dest_item_path: %s\n", final_path);
+            // //variable check
 
             if (stat(source_path, &sb1) == -1) {
                 perror("couldn't get source_path stat");
@@ -382,13 +396,20 @@ int take(Shell *shell) {
             printf("You took: %s\n", filename);
 
             // Increment user rank
-            if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {user_rank = 1;
-            } else if (strcmp(filename, "flamethrower.item") == 0 && user_rank == 1) {
+            if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {
+                user_rank = 1;
+            } else if (strcmp(filename, "flamethrower.item") == 0 &&
+                       user_rank == 1) {
                 user_rank = 2;
-            } else if (strcmp(filename, "car_battery.item") == 0 && user_rank == 2) {
+            } else if (strcmp(filename, "car_battery.item") == 0 &&
+                       user_rank == 2) {
                 user_rank = 3;
             }
+
+            free(source_path);
+            free(final_path);
         }
+        free(filename);
     }
 
     closedir(dir);
@@ -397,19 +418,20 @@ int take(Shell *shell) {
     if (!found_item) {
         printf("There is nothing here.\n");
     }
+    free(initial_path);
     return 0;
 }
 
-int inventory(Shell *shell){
+int inventory(Shell *shell) {
 
-    int inv_index = find_variable("INVENTORY", shell->env->list, shell->env->num);
-    char* dir_name = shell->env->list[inv_index]->value;
+    int inv_index =
+        find_variable("INVENTORY", shell->env->list, shell->env->num);
+    char *dir_name = shell->env->list[inv_index]->value;
 
     DIR *dir;
     struct dirent *entry;
     Item *item;
-    char *ext;
-    char item_path[100];
+    char *ext, *item_path;
 
     if ((dir = opendir(dir_name)) == NULL) {
         perror("opendir error");
@@ -420,8 +442,11 @@ int inventory(Shell *shell){
         if ((ext = strstr(entry->d_name, ".item")) !=
             NULL) { // looks for a sub-string inside a string
 
-            //strcat(dir_name, entry->d_name);
-            snprintf(item_path, sizeof(item_path), "%s/%s", dir_name, entry->d_name);
+            item_path = malloc(sizeof(char) *
+                               (strlen(dir_name) + strlen(entry->d_name) + 2));
+            strcpy(item_path, dir_name);
+            strcat(item_path, "/");
+            strcat(item_path, entry->d_name);
 
             item = load_item(item_path);
 
@@ -431,6 +456,8 @@ int inventory(Shell *shell){
                 print("Usage: %s\n", item->usage);
                 free_item(item);
             }
+
+            free(item_path);
         }
     }
     closedir(dir);
@@ -548,7 +575,8 @@ Shell *sh_init(void) {
 }
 
 // BUILTINS
-char *builtin_str[] = {"cd", "env", "exit", "export", "history", "take", "inventory"};
+char *builtin_str[] = {"cd",      "env",  "exit",     "export",
+                       "history", "take", "inventory"};
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
@@ -615,8 +643,9 @@ int sh_inventory(Shell *shell, int argc, char **argv) {
     return 1;
 }
 
-int (*builtin_func[])(Shell *, int, char **) = {&sh_cd, &sh_env, &sh_exit,
-                                                &sh_export, &sh_history, &sh_take, &sh_inventory};
+int (*builtin_func[])(Shell *, int, char **) = {
+    &sh_cd,      &sh_env,  &sh_exit,     &sh_export,
+    &sh_history, &sh_take, &sh_inventory};
 
 int check_builtin(char *cmd) {
 
@@ -727,7 +756,18 @@ char *read_cmd(Shell *shell, int *res) {
     return cmd;
 }
 
+int check_cmd(char *cmd) {
 
+    int num_quotes = 0;
+
+    while (*cmd != '\0') {
+        if (*cmd == '"')
+            ++num_quotes;
+        ++cmd;
+    }
+
+    return num_quotes % 2 == 0;
+}
 
 int execute(Shell *shell, int argc, char *argv[], int p[2], int end) {
 
@@ -902,70 +942,75 @@ int sh_loop(Shell *shell, int debug) {
         print("%s", shell->env->list[1]->value);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
 
-            save_history(shell, command);
+            if (check_cmd(command)) {
 
-            if (debug) {
+                save_history(shell, command);
 
-                print("\nInit command: %s\n", command);
+                if (debug) {
 
-                in = init_input(command);
-                if (separate(in)) {
-                    print_input(in);
+                    print("\nInit command: %s\n", command);
 
-                    print("\nTokenization\n");
-                    tokens = tokenize(in);
-                    print_tokens(tokens);
+                    in = init_input(command);
+                    if (separate(in)) {
+                        print_input(in);
 
-                    print("\nRPN\n");
-                    rpn_tokens = to_rpn(tokens);
-                    print_cmd(rpn_tokens);
-                    if (check_rpn(rpn_tokens)) {
+                        print("\nTokenization\n");
+                        tokens = tokenize(in);
+                        print_tokens(tokens);
 
-                        print("\nAST\n");
-                        ast = rpn_to_ast(rpn_tokens);
-                        if (check_ast(shell, ast, &num_cmd)) {
-                            print_ast(ast);
+                        print("\nRPN\n");
+                        rpn_tokens = to_rpn(tokens);
+                        print_cmd(rpn_tokens);
+                        if (check_rpn(rpn_tokens)) {
 
-                            print("\nExecuting\n");
-                            init_executor(ast, shell, num_cmd);
-                        }
-                        free_ast(ast);
+                            print("\nAST\n");
+                            ast = rpn_to_ast(rpn_tokens);
+                            if (check_ast(shell, ast, &num_cmd)) {
+                                print_ast(ast);
 
-                    } else
-                        print_err("Error: invalid command.\n");
+                                print("\nExecuting\n");
+                                init_executor(ast, shell, num_cmd);
+                            }
+                            free_ast(ast);
 
-                    free_cmd(rpn_tokens);
-                    free_tokens(tokens);
-                }
-                free_input(in);
-                free(command);
-            }
+                        } else
+                            print_err("Error: invalid command.\n");
 
-            else {
-
-                in = init_input(command);
-                if (separate(in)) {
-
-                    tokens = tokenize(in);
-                    rpn_tokens = to_rpn(tokens);
-
-                    if (check_rpn(rpn_tokens)) {
-                        ast = rpn_to_ast(rpn_tokens);
-
-                        if (check_ast(shell, ast, &num_cmd))
-                            init_executor(ast, shell, num_cmd);
-
-                        free_ast(ast);
-
-                    } else
-                        print_err("Semantic error: invalid command.\n");
-
-                    free_cmd(rpn_tokens);
-                    free_tokens(tokens);
+                        free_cmd(rpn_tokens);
+                        free_tokens(tokens);
+                    }
+                    free_input(in);
+                    free(command);
                 }
 
-                free_input(in);
-                free(command);
+                else {
+
+                    in = init_input(command);
+                    if (separate(in)) {
+
+                        tokens = tokenize(in);
+                        rpn_tokens = to_rpn(tokens);
+
+                        if (check_rpn(rpn_tokens)) {
+                            ast = rpn_to_ast(rpn_tokens);
+
+                            if (check_ast(shell, ast, &num_cmd))
+                                init_executor(ast, shell, num_cmd);
+
+                            free_ast(ast);
+
+                        } else
+                            print_err("Semantic error: invalid command.\n");
+
+                        free_cmd(rpn_tokens);
+                        free_tokens(tokens);
+                    }
+
+                    free_input(in);
+                    free(command);
+                }
+            } else {
+                print_err("Syntax error: incorrect number of quotes\n");
             }
         }
         if (!res) {

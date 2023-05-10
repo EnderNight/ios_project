@@ -29,7 +29,8 @@ void readScenario() {
     // We use lseek to go to the right place in the file
     // The offset is the number of characters in the file
     // In order to get the offset, we execute this command on a terminal :
-    // grep -b -o 'Directory' scenario.txt | awk '{print $1+length("Directory")}'
+    // grep -b -o 'Directory' scenario.txt | awk '{print
+    // $1+length("Directory")}'
     // + 1}' We get the number of bytes before the word
     if (strcmp(directory, "start") == 0) {
         lseek(file, 6, SEEK_SET);
@@ -111,10 +112,9 @@ void readScenario() {
         }
     }
 
-    //Here, we print the death messages, or win messages
-    if (strcmp(directory, "do_nothing") == 0 || 
-    strcmp(directory, "talk") == 0 ||
-    strcmp(directory, "pass_them") == 0) {
+    // Here, we print the death messages, or win messages
+    if (strcmp(directory, "do_nothing") == 0 ||
+        strcmp(directory, "talk") == 0 || strcmp(directory, "pass_them") == 0) {
         change_color("red");
         print("\nYou died ! Go back with cd .. to try again !\n");
     }
@@ -141,7 +141,6 @@ int cd(int argc, char *argv[]) {
         return 1;
     }
 
-
     if (argv[1][0] == '.') {
         char cwd[456];
         getcwd(cwd, sizeof(cwd));
@@ -163,13 +162,13 @@ int cd(int argc, char *argv[]) {
             change_color("white");
             return 0;
         }
-        
+
         // Before reading, we check the user's global rank
-        // If he made a choice, check the directory he is in, and depending on it we decide if we print the story or not
-        
+        // If he made a choice, check the directory he is in, and depending on
+        // it we decide if we print the story or not
+
         // kill_him does not display if user_rank == 2
         // 2f, 1f does not display if user_rank == 3
-
     }
 
     // Check if the player has the right to access the directory
