@@ -81,7 +81,7 @@ void readScenario() {
         lseek(file, 7278, SEEK_SET);
     }
     if (strcmp(directory, "fix_car") == 0) {
-        lseek(file, 10255, SEEK_SET);
+        lseek(file, 10256, SEEK_SET);
     }
     if (strcmp(directory, "pass_them") == 0) {
         lseek(file, 7868, SEEK_SET);
@@ -171,14 +171,6 @@ int cd(int argc, char *argv[]) {
         // 2f, 1f does not display if user_rank == 3
     }
 
-    // Check if the player has the right to access the directory
-    // If not, print a small text
-    // print("I can't do that !\n Maybe I'm missing something...\n")
-    // The player can only access the directory if he has the right group
-
-    // kill_him needs to have user_rank == 1
-    // 3f needs to have user_rank == 2
-    // fix_car needs to have user_rank == 3
 
     if (chdir(argv[1]) != 0) {
         change_color("red");

@@ -46,6 +46,7 @@ int main(int argc, char **argv) {
             // Clear the shell screen
             print("\033[2J");
 
+            
             // Going to the right directory, will display the story
             chdir("story");
             change_color("cyan");

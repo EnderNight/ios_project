@@ -309,19 +309,19 @@ int take(Shell *shell) {
         find_variable("USER_RANK", shell->env->list, shell->env->num);
     int user_rank = atoi(shell->env->list[user_rank_index]->value);
 
-    fprintf(stderr, "user_rank: %d\n", user_rank);
+    //fprintf(stderr, "user_rank: %d\n", user_rank);
 
     char *initial_path;
     if ((initial_path = getcwd(NULL, 0)) != NULL) {
-        char *dir_name = strrchr(initial_path, '/');
-        change_color("cyan");
-        print("I am in : %s\n", dir_name ? dir_name + 1 : initial_path);
-        change_color("white");
+        //char *dir_name = strrchr(initial_path, '/');
+        //change_color("cyan");
+        //print("I am in : %s\n", dir_name ? dir_name + 1 : initial_path);
+        //change_color("white");
     } else {
         error("getcwd() error");
     }
 
-    fprintf(stderr, "initial_path: %s\n", initial_path);
+    //fprintf(stderr, "initial_path: %s\n", initial_path);
 
     int inv_index =
         find_variable("INVENTORY", shell->env->list, shell->env->num);
@@ -393,7 +393,9 @@ int take(Shell *shell) {
             }
 
             found_item = true;
+            change_color("cyan");
             printf("You took: %s\n", filename);
+            change_color("white");
 
             // Increment user rank
             if (strcmp(filename, "knife.item") == 0 && user_rank == 0) {
@@ -412,6 +414,10 @@ int take(Shell *shell) {
         free(filename);
     }
 
+    //user_rank to char
+    char rank_str[2];
+    sprintf(rank_str, "%d", user_rank);
+    change_variable_value(shell, rank_str, user_rank_index);
     closedir(dir);
 
     // if no items were found
@@ -581,6 +587,87 @@ int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
     UNUSED(shell);
+    // Check if the player has the right to access the directory
+    // If not, print a small text
+    // print("I can't do that !\n Maybe I'm missing something...\n")
+    // The player can only access the directory if he has the right group
+
+    // kill_him needs to have user_rank == 1
+    // 3f needs to have user_rank == 2
+    // fix_car needs to have user_rank == 3
+
+    int user_rank_index =
+        find_variable("USER_RANK", shell->env->list, shell->env->num);
+    int user_rank = atoi(shell->env->list[user_rank_index]->value);
+
+    //check if the player tries to go in kill_him
+    if (strcmp(args[1], "kill_him") == 0) {
+        if (user_rank != 1) {
+            print("I have no weapons !\n");
+            change_color("magenta");
+            print("Maybe I'm missing something...\n");
+            change_color("white");
+            return 1;
+        }
+    }
+
+    //check if the player tries to go in 3f
+    if (strcmp(args[1], "3f") == 0) {
+        if (user_rank != 2) {
+            print("Too many zombies, I don't want to die !\n");
+            change_color("magenta");
+            print("Maybe I'm missing something...\n");
+            change_color("white");
+            return 1;
+        }
+    }
+
+    //check if the player tries to go in fix_car
+    if (strcmp(args[1], "fix_car") == 0) {
+        if (user_rank != 3) {
+            print("I can't do that !\n");
+            change_color("magenta");
+            print("Maybe I'm missing something...\n");
+            change_color("white");
+            return 1;
+        }
+    }
+
+    if (args[1][0] == '.') 
+    {
+        //get path if we go back
+        char cwd[456];
+        getcwd(cwd, sizeof(cwd));
+        char *last = strrchr(cwd, '/');
+        //if the player is in investigate, when going back to kill_him, we will not print text
+        //to check that, we see if the player is rank 2
+        if (strcmp(last, "/investigate") == 0) 
+        {
+            change_color("green");
+            print("He is still there...\n");
+            sleep(1);
+            print("Lying on the ground...\n");
+            //go to start
+            chdir("..");
+            change_color("white");
+            return 1;
+        }
+
+        if (strcmp(last, "/kill_him") == 0 || strcmp(last, "/3f") == 0 || strcmp(last, "/fix_car") == 0)
+        {
+            chdir("..");
+            return 1;
+        }
+        if (strcmp(last, "/friends_house") == 0 || strcmp(last, "/roundabout") == 0)
+        {
+            change_color("green");
+            print("I'm back to where it started\n");
+            change_color("white");
+            chdir("..");
+            return 1;
+        }
+    }
+
     return cd(argc, args);
 }
 
