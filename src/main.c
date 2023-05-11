@@ -3,12 +3,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <termios.h>
+#include <unistd.h>
 
 // If you are on the server, remove the argument '-fsanitize=address' inside the
 // Makefile file!!
-
 
 struct termios orig_termios;
 

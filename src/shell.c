@@ -9,6 +9,7 @@
 #include "cd.h"
 #include "item.h"
 
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -702,19 +703,23 @@ int is_cmd(Shell *shell, char *cmd) {
     return res;
 }
 
-void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index, size_t sep) {
+void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index,
+                 size_t cmd_len) {
+
+    char tmp[cmd_len + 1];
+    strncpy(tmp, input, cmd_len);
+    tmp[cmd_len] = '\0';
 
     print("\33[2K\r%s", shell->env->list[cur_prompt]->value);
 
-    if (!sep) {
-        if (is_cmd(shell, input)) {
-            change_color("green");
-        } else
-            change_color("red");
-    }
+    if (is_cmd(shell, tmp)) {
+        change_color("green");
+    } else
+        change_color("red");
 
-    print("%s", input + start_index);
+    print("%s", tmp);
     change_color("white");
+    print("%s", input + start_index + cmd_len);
 }
 
 /*
@@ -731,8 +736,8 @@ void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index, 
  */
 char *read_cmd(Shell *shell, int *res) {
 
-    int cur_prompt = 1;
-    size_t i = 0, size = 1, multi_index = 0, sep = 0;
+    int cur_prompt = 1, sep = 0, i = 0;
+    size_t size = 1, multi_index = 0, cmd_len = 0;
     ssize_t ret;
     unsigned char end = 0;
     char *cmd = malloc(sizeof(char));
@@ -752,22 +757,31 @@ char *read_cmd(Shell *shell, int *res) {
                     print("\n%s", shell->env->list[2]->value);
                     cur_prompt = 2;
                     i -= 2;
-                    multi_index = i;
+                    multi_index = (size_t)i;
                 }
             }
 
-            if (cmd[i] == 127 && i > 0) {
-                if (i > 1)
-                    cmd[i-1] = '\0';
+            if (iscntrl(cmd[i]) && !end) {
+                if (cmd[i] == 127 && i > 0) {
+                    if (i > 1)
+                        cmd[i - 1] = '\0';
 
-                cmd[i] = '\0';
-                i -= 2;
+                    cmd[i] = '\0';
+                    i -= 2;
+                    if ((size_t)i == cmd_len)
+                        sep = 0;
+                } else {
+                    cmd[i] = '\0';
+                    --i;
+                }
             }
 
+            if (i >= 0 && cmd[i] == ' ' && !sep)
+                sep = 1;
 
             ++i;
 
-            if (i == size) {
+            if ((size_t)i == size) {
                 size *= 2;
                 cmd = realloc(cmd, sizeof(char) * size);
                 if (cmd == NULL)
@@ -775,7 +789,10 @@ char *read_cmd(Shell *shell, int *res) {
             }
 
             cmd[i] = '\0';
-            parse_input(shell, cur_prompt, cmd, multi_index, sep);
+            if (!sep)
+                cmd_len = (size_t)i;
+
+            parse_input(shell, cur_prompt, cmd, multi_index, cmd_len);
         }
 
         if (ret == -1)
@@ -786,7 +803,7 @@ char *read_cmd(Shell *shell, int *res) {
     case 0:
     case 1:
         cmd[i] = '\0';
-        cmd = realloc(cmd, sizeof(char) * (i + 1));
+        cmd = realloc(cmd, sizeof(char) * ((size_t)i + 1));
         if (cmd == NULL) {
             perror("read_cmd realloc");
         }
@@ -807,7 +824,6 @@ char *read_cmd(Shell *shell, int *res) {
     *res = (int)ret;
     return cmd;
 }
-
 
 int check_cmd(char *cmd) {
 
