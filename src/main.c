@@ -15,9 +15,7 @@ void disableRawMode(void) { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
 
 void enableRawMode(void) {
 
-    tcsetattr(STDIN_FILENO, TCION, &orig_termios);
-
-    struct termios raw;
+    struct termios raw = orig_termios;
     tcgetattr(STDIN_FILENO, &raw);
     raw.c_lflag &= (unsigned int)~(ECHO | ICANON);
 
@@ -53,6 +51,8 @@ int main(int argc, char **argv) {
 
         Shell *shell;
         int debug = 0;
+
+        tcgetattr(STDIN_FILENO, &orig_termios);
 
         enableRawMode();
         shell = sh_init();
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    disableRawMode();
+    // disableRawMode();
     print("Incorrect number of arguments: ./main <debug switch (optional)>\n");
     return 1;
 }

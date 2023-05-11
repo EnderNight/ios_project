@@ -8,9 +8,9 @@
 void whereami(void) {
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        char *dir_name = strrchr(cwd, '/');
+        char *dir_name = strstr(cwd, "story");
         change_color("cyan");
-        print("I am in : %s\n", dir_name ? dir_name + 1 : cwd);
+        print("I am in : %s\n", dir_name ? dir_name : cwd);
         change_color("white");
     } else {
         perror("getcwd() error");
