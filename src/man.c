@@ -59,7 +59,11 @@ int main(int argc, char *argv[]) {
     // We match the command with the manual
     switch (argv[1][0]) {
     case 'c':
-        strcat(path, "cd.txt");
+        //There is cd and cat, so we check
+        if (argv[1][1] == 'd')
+            strcat(path, "cd.txt");
+        else
+            strcat(path, "cat.txt");
         readMan(path);
         change_color("white");
         break;
