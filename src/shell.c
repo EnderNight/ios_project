@@ -20,17 +20,15 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h> // waitpid
+#include <termios.h>
 #include <unistd.h>
 
 #define PROMPT "Outside> "
 #define BINDIR "bin"
-#define VAR_NAME_MAX_LENGTH 20
-#define VAR_VALUE_MAX_LENGTH 100
 #define ReadEnd 0
 #define WriteEnd 1
 
 // Utils
-
 void free_variable(Variable *var) {
 
     free(var->name);
@@ -681,13 +679,42 @@ int check_ast(Shell *shell, AST *ast, int *num_cmd) {
     if (ast->token->type == TOKEN_AMPER) {
         res = check_ast(shell, ast->children[0], num_cmd);
         if (ast->num_children > 1) {
-            res &= check_ast(shell, ast->children[0], num_cmd);
+            res = res && check_ast(shell, ast->children[1], num_cmd);
         }
         return res;
     }
 
     return check_ast(shell, ast->children[0], num_cmd) &&
            check_ast(shell, ast->children[1], num_cmd);
+}
+
+int is_cmd(Shell *shell, char *cmd) {
+
+    int res = 0;
+    char *tmp;
+
+    if ((tmp = find_command(shell, cmd)) != NULL) {
+        free(tmp);
+        res = 1;
+    } else if (check_builtin(cmd))
+        res = 1;
+
+    return res;
+}
+
+void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index, size_t sep) {
+
+    print("\33[2K\r%s", shell->env->list[cur_prompt]->value);
+
+    if (!sep) {
+        if (is_cmd(shell, input)) {
+            change_color("green");
+        } else
+            change_color("red");
+    }
+
+    print("%s", input + start_index);
+    change_color("white");
 }
 
 /*
@@ -704,35 +731,55 @@ int check_ast(Shell *shell, AST *ast, int *num_cmd) {
  */
 char *read_cmd(Shell *shell, int *res) {
 
-    size_t i = 0, size = 1;
+    int cur_prompt = 1;
+    size_t i = 0, size = 1, multi_index = 0, sep = 0;
     ssize_t ret;
     unsigned char end = 0;
     char *cmd = malloc(sizeof(char));
 
-    while (!end && (ret = read(STDIN_FILENO, cmd + i, sizeof(char))) == 1) {
+    while (!end) {
 
-        if (cmd[i] == '\n') {
-            if (!i || cmd[i - 1] != '\\') {
-                if (!i) {
-                    cmd[i] = '\0';
+        ret = read(STDIN_FILENO, cmd + i, sizeof(char));
+
+        if (ret) {
+            if (cmd[i] == '\n') {
+                if (!i || cmd[i - 1] != '\\') {
+                    if (!i) {
+                        cmd[i] = '\0';
+                    }
+                    end = 1;
+                } else {
+                    print("\n%s", shell->env->list[2]->value);
+                    cur_prompt = 2;
+                    i -= 2;
+                    multi_index = i;
                 }
-                end = 1;
-            } else {
-                print("%s", shell->env->list[2]->value);
+            }
+
+            if (cmd[i] == 127 && i > 0) {
+                if (i > 1)
+                    cmd[i-1] = '\0';
+
+                cmd[i] = '\0';
                 i -= 2;
             }
-        }
 
-        ++i;
 
-        if (i == size) {
-            size *= 2;
-            cmd = realloc(cmd, sizeof(char) * size);
-            if (cmd == NULL) {
-                perror("read_cmd realloc");
-                end = 1;
+            ++i;
+
+            if (i == size) {
+                size *= 2;
+                cmd = realloc(cmd, sizeof(char) * size);
+                if (cmd == NULL)
+                    error("read_cmd realloc");
             }
+
+            cmd[i] = '\0';
+            parse_input(shell, cur_prompt, cmd, multi_index, sep);
         }
+
+        if (ret == -1)
+            end = 1;
     }
 
     switch (ret) {
@@ -752,9 +799,15 @@ char *read_cmd(Shell *shell, int *res) {
         break;
     }
 
+    if (cmd[0] == '\0') {
+        free(cmd);
+        cmd = NULL;
+    }
+
     *res = (int)ret;
     return cmd;
 }
+
 
 int check_cmd(char *cmd) {
 
