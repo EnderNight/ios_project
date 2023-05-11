@@ -448,8 +448,7 @@ int inventory(Shell *shell) {
         if ((ext = strstr(entry->d_name, ".item")) !=
             NULL) { // looks for a sub-string inside a string
 
-            item_path = malloc(sizeof(char) *
-                               (strlen(dir_name) + strlen(entry->d_name) + 2));
+            item_path = malloc(sizeof(char) * (strlen(dir_name) + strlen(entry->d_name) + 2));
             strcpy(item_path, dir_name);
             strcat(item_path, "/");
             strcat(item_path, entry->d_name);
