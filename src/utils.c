@@ -109,8 +109,14 @@ void change_color(char *color) {
         write(0, "\033[0;35m", 7);
     } else if (strcmp(color, "cyan") == 0) {
         write(0, "\033[0;36m", 7);
+    } else if (strcmp(color, "italic") == 0) {
+        write(0, "\033[3m", 4);
     } else if (strcmp(color, "white") == 0) {
         write(0, "\033[0;37m", 7);
+    } else if (strcmp(color, "smallyellow") == 0) {
+        write(0, "\033[0;33m", 7);
+    } else if (strcmp(color, "bigcyan") == 0) {
+        write(0, "\033[1;36m", 7);
     } else {
         fprintf(stderr, "Color not found\n");
     }

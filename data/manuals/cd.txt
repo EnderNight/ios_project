@@ -1,8 +1,28 @@
 
-Usage: cd [OPTION]
-Use this to move around
+--NAME--
+    cd - change the current working directory
 
-OPTIONS:
-    .., Move back
-    <Direction>, Move to this direction
+--USAGE--
+    cd [OPTION]
+
+--OPTIONS--
+    ..: Move back to the parent directory.
+    <directory>: Move to the specified directory.
+
+--DESCRIPTION--
+    The cd command changes the current working directory of the shell. 
+    If the .. option is specified, it moves back to the parent directory. 
+    If a <directory> is specified, it moves to the specified directory.
+
+--ARGUMENTS--
+    OPTION: The option to specify the desired directory.
+
+--SYSTEM CALLS--
+    -lseak
+    -getcwd
+    -putchar
+    -chdir
+    -write
+    -open
+    -close
 

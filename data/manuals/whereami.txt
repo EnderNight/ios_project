@@ -1,4 +1,20 @@
 
-Usage: whereami
-Where you are at the moment
+--NAME--
+    whereami - print the current working directory name
+
+--USAGE--
+    whereami
+
+--OPTIONS--
+    None
+    
+--DESCRIPTION--
+    The whereami command is used to print the name of the current working directory. It does not take any arguments.
+    When executed, it uses the getcwd system call to retrieve the current working directory path and prints the name of the directory using the printf function. If there is an error retrieving the current working directory, it uses the perror function to print an error message.
+
+--ARGUMENTS--
+    None
+
+--SYSTEM CALLS--
+    -getcwd
 

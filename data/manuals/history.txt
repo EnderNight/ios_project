@@ -1,0 +1,24 @@
+
+--NAME--
+    history - display a list of the most recently executed commands
+
+--USAGE--
+    history
+
+--OPTIONS--
+    None
+
+--DESCRIPTION--
+    The history command displays a list of the most recently executed commands in the shell.
+    The number of commands displayed is limited to 10 by default, but can be increased by setting the NUM_CMD environment variable to a larger value.
+
+--ARGUMENTS--
+    None
+
+--SYSTEM CALLS--
+    -open
+    -read
+    -close
+    -write
+
+    

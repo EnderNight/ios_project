@@ -31,34 +31,25 @@ int main(int argc, char *argv[]) {
     change_color("magenta");
     // We check if the user has entered a command
     if (argc != 2 || argv[1] == NULL || strlen(argv[1]) == 0) {
+        print( "  __  __                         _     \n");
+        print( " |  \\/  |                       | |    \n");
+        print( " | \\  / | __ _ _ __  _   _  __ _| |___ \n");
+        print( " | |\\/| |/ _\\` | '_ \\| | | |/ _\\`  |/__|\n");
+        print( " | |  | | (_| | | | | |_| | (_| | \\__\\\n");
+        print( " |_|  |_|\\__,_|_| |_|\\__,_|\\__,_|_|___/\n");
         print("\n");
-        print("\n");
-        print("MMMMMMMM               MMMMMMMM                                                                       lllllll                  \n");
-        print("M:::::::M             M:::::::M                                                                       l:::::l                  \n");
-        print("M::::::::M           M::::::::M                                                                       l:::::l                  \n");
-        print("M:::::::::M         M:::::::::M                                                                       l:::::l                  \n");
-        print("M::::::::::M       M::::::::::M  aaaaaaaaaaaaa  nnnn  nnnnnnnn    uuuuuu    uuuuuu    aaaaaaaaaaaaa    l::::l     ssssssssss   \n");
-        print("M:::::::::::M     M:::::::::::M  a::::::::::::a n:::nn::::::::nn  u::::u    u::::u    a::::::::::::a   l::::l   ss::::::::::s  \n");
-        print("M:::::::M::::M   M::::M:::::::M  aaaaaaaaa:::::an::::::::::::::nn u::::u    u::::u    aaaaaaaaa:::::a  l::::l ss:::::::::::::s \n");
-        print("M::::::M M::::M M::::M M::::::M           a::::ann:::::::::::::::nu::::u    u::::u             a::::a  l::::l s::::::ssss:::::s\n");
-        print("M::::::M  M::::M::::M  M::::::M    aaaaaaa:::::a  n:::::nnnn:::::nu::::u    u::::u      aaaaaaa:::::a  l::::l  s:::::s  ssssss \n");
-        print("M::::::M   M:::::::M   M::::::M  aa::::::::::::a  n::::n    n::::nu::::u    u::::u    aa::::::::::::a  l::::l    s::::::s     \n");
-        print("M::::::M    M:::::M    M::::::M a::::aaaa::::::a  n::::n    n::::nu::::u    u::::u   a::::aaaa::::::a  l::::l       s::::::s  \n");
-        print("M::::::M     MMMMM     M::::::Ma::::a    a:::::a  n::::n    n::::nu:::::uuuu:::::u  a::::a    a:::::a  l::::l ssssss   s:::::s\n");
-        print("M::::::M               M::::::Ma::::a    a:::::a  n::::n    n::::n u:::::::::::::::ua::::a    a:::::a l::::::ls:::::ssss::::::s\n");
-        print("M::::::M               M::::::Ma:::::aaaa::::::a  n::::n    n::::n  uu::::::::uu:::u a:::::aaaa::::::a l::::::ls::::::::::::::s \n");
-        print("M::::::M               M::::::M a::::::::::aa:::a n::::n    n::::n    uuuuuuuu  uuuu  aaaaaaaaaa  aaaallllllll  sssssssssss   \n");
-        print("\n\n\n\n\n\n\n");
 
         //List all the manuals
-        print("cd\n");
-        print("ls\n");
-        print("inventory\n");
-        print("whereami\n");
-        print("env\n");
-        print("cat\n");
-        print("rename\n");
-        print("take\n");
+        print("Here is what you can do :\n");
+        print("--   cd\n");
+        print("--   ls\n");
+        print("--   inventory\n");
+        print("--   whereami\n");
+        print("--   env\n");
+        print("--   cat\n");
+        print("--   rename\n");
+        print("--   take\n");
+        print("--   history\n");
 
         change_color("white");
 
@@ -84,6 +75,26 @@ int main(int argc, char *argv[]) {
         break;
     case 'w':
         strcat(path, "whereami.txt");
+        readMan(path);
+        change_color("white");
+        break;
+    case 'e':
+        strcat(path, "env.txt");
+        readMan(path);
+        change_color("white");
+        break;
+    case 'r':
+        strcat(path, "rename.txt");
+        readMan(path);
+        change_color("white");
+        break;
+    case 't':
+        strcat(path, "take.txt");
+        readMan(path);
+        change_color("white");
+        break;
+    case 'h':
+        strcat(path, "history.txt");
         readMan(path);
         change_color("white");
         break;

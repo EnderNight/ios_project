@@ -590,7 +590,7 @@ void print_prompt(Shell *shell, int prompt) {
 
     index = find_variable(prmt, shell->env->list, shell->env->num);
     if (index != -1) {
-        change_color("cyan");
+        change_color("bigcyan");
         print("%s", shell->env->list[index]->value);
         change_color("white");
         print("> ");

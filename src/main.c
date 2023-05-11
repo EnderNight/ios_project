@@ -77,9 +77,11 @@ int main(int argc, char **argv) {
             print("  |  .-.  ||  .___.'  \\ |  | |  | ||  |`-'|  |  .-.  |(|  '---.' |   /  /\\_  |  .___.'.-._)   \\ |  .--'  \n");
             print("  |  | |  ||  |        `'  '-'  '(_'  '--'\\  |  | |  | |      |  `-./  /.__) |  |     \\       / |  `---. \n");
             print("  `--' `--'`--'          `-----'    `-----'  `--' `--' `------'    `--'      `--'      `-----'  `------' \n\n");
-            change_color("cyan");
+            change_color("yellow");
             sleep(1);
+            change_color("italic");
             print("When you are ready, go to the start directory!\n");
+            print("If you are confused, use 'man' to get help!\n");
             change_color("white");
 
             sh_loop(shell, debug);

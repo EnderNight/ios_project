@@ -1,4 +1,26 @@
 
-Usage: ls //CHANGE TO SCENARIO COMMAND NAME
-Will list all the directions you can take
+--NAME--
+    ls - list files and directories in a specified directory
+
+--USAGE--
+    ls [OPTION]... [FILE]...
+
+--OPTIONS--
+    -a : Show all files, including hidden files
+    -l : Display detailed information about each file
+
+--DESCRIPTION--
+    The ls command is used to list the files and directories in the specified directory. If no directory is specified, it will list the contents of the current directory.
+    By default, hidden files are not displayed. If the "-a" option is used, all files, including hidden files, will be displayed.
+    If the "-l" option is used, the command will display detailed information about each file, including the file permissions, owner, size, and modification date.
+
+--ARGUMENTS--
+    [FILE]... : Specify the directory or directories to list. If no directory is specified, the command will list the contents of the current directory.
+
+--SYSTEM CALLS--
+    -opendir
+    -readdir
+    -closedir
+    -perror
+    -exit
 

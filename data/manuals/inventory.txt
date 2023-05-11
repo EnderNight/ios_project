@@ -1,4 +1,23 @@
 
-Usage: inventory
-Will list all the items you have with you
+--NAME--
+    inventory - display a list of items in a specified directory
+
+--USAGE--
+    inventory
+
+--OPTIONS--
+    None
+    
+--DESCRIPTION--
+    The inventory command displays a list of items located in the directory specified by the INVENTORY environment variable.
+    Items are identified by the ".item" file extension. For each item found, the command prints the name, description, and usage information.
+
+--ARGUMENTS--
+    None
+
+--SYSTEM CALLS--
+    -opendir
+    -readdir
+    -write 
+    -closedir
 

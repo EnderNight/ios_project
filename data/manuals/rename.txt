@@ -1,0 +1,25 @@
+
+--NAME--
+    rename - rename or move files
+
+--USAGE--
+    rename <old_name> <new_name>
+
+--OPTIONS--
+    None
+
+--DESCRIPTION--
+    The rename command is used to rename or move files. It takes two arguments: the name of the file to be renamed or moved (old_name), and the new name or destination of the file (new_name).
+    If the file specified by old_name exists, it will be renamed or moved to the location specified by new_name. If a file with the same name as new_name already exists, it will be overwritten.
+    This command can only be used to rename or move regular files. Directories cannot be renamed or moved using the mv command.
+
+--ARGUMENTS--
+    <old_name> : The name of the file to be renamed or moved
+    <new_name> : The new name or destination of the file
+
+--SYSTEM CALLS--
+    -stat
+    -link
+    -unlink
+    -perror
+

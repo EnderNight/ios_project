@@ -107,7 +107,7 @@ void readScenario() {
             // If there is a newline, we wait
             if (c == '\n')
                 // TODO : change this line when tests are gooood
-                sleep(1);
+                usleep(1);
             usleep(9000);
         }
     }

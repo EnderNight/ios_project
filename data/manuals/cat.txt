@@ -1,0 +1,26 @@
+
+--NAME--
+    cat - concatenate and display files
+
+--USAGE--
+    cat [FILE]...
+
+--OPTIONS--
+    - None
+
+--DESCRIPTION--
+    The cat command reads one or more files and prints their contents to the standard output. 
+    If no file is specified, it reads from the standard input. 
+    It is often used to display the contents of a file on the terminal, or to combine multiple files into a single file.
+
+--ARGUMENTS--
+    FILE: The name of the file(s) to be displayed. Multiple files can be specified, separated by spaces.
+
+--SYSTEM CALLS--
+    - open
+    - read
+    - write
+    - close
+    - stat
+
+    

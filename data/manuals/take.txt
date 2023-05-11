@@ -1,0 +1,24 @@
+
+--NAME--
+    take - move specified items from current directory to inventory
+
+--USAGE--
+    take
+
+--OPTIONS--
+    None
+
+--DESCRIPTION--
+    The take function is responsible for moving specified items from the current directory to the inventory of the user.
+
+--ARGUMENTS--
+    None
+
+--SYSTEM CALLS--
+    -getcwd
+    -opendir
+    -readdir
+    -stat
+    -link
+    -unlink
+
