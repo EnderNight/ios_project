@@ -1,0 +1,13 @@
+
+Nobody will help you. You know that you can use:
+        - "cd" to move from one place ( directory) to another.
+        - If you are scared, go back with "cd ..".
+        - You can check your "items" and next destinations with the command "ls" 
+        - To see where you are just say "whereami".
+        - The command "take" is used to choose an item , select and keep on inventory. Once the item is used it will not appear again.
+        - If you want to see what item you have obtained use the command "inventory", a directory that will have your saved items. 
+	- To known your user especifications such as the user_rank use "env". 
+   	- To see your last 10 steps use the command "history" that will print the ten last commnads you typed. 
+  	- To change the name of the file use the comand "rename <originalname> <newname>
+	- If you want to know the content of a file just use the "cat <namefile> command
+	- The command "man" will tell you what are the actions that you can do (commands) in this game. If you use "man <nameofcommand> the specification of that command will be printed. 
