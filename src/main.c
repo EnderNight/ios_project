@@ -3,10 +3,24 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 
 // If you are on the server, remove the argument '-fsanitize=address' inside the
 // Makefile file!!
+
+struct termios orig_termios;
+
+void disableRawMode(void) { tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios); }
+
+void enableRawMode(void) {
+
+    struct termios raw = orig_termios;
+    tcgetattr(STDIN_FILENO, &raw);
+    raw.c_lflag &= (unsigned int)~(ECHO | ICANON);
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+}
 
 int main(int argc, char **argv) {
     // Clear the shell screen
@@ -24,6 +38,9 @@ int main(int argc, char **argv) {
         Shell *shell;
         int debug = 0;
 
+        tcgetattr(STDIN_FILENO, &orig_termios);
+
+        enableRawMode();
         shell = sh_init();
 
         if (shell == NULL) {
@@ -35,6 +52,7 @@ int main(int argc, char **argv) {
                 print("Incorrect debug value '%d'. Must be either nothing, 0 "
                       "or 1.\n",
                       debug);
+                disableRawMode();
                 sh_end(shell);
                 return 1;
             } else
@@ -63,13 +81,16 @@ int main(int argc, char **argv) {
             sleep(1);
             print("When you are ready, go to the start directory!\n");
             change_color("white");
+
             sh_loop(shell, debug);
         }
 
         sh_end(shell);
+        disableRawMode();
         return 0;
     }
 
+    // disableRawMode();
     print("Incorrect number of arguments: ./main <debug switch (optional)>\n");
     return 1;
 }

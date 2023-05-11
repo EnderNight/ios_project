@@ -9,6 +9,7 @@
 #include "cd.h"
 #include "item.h"
 
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -20,17 +21,15 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h> // waitpid
+#include <termios.h>
 #include <unistd.h>
 
-#define PROMPT "Outside> "
+#define PROMPT "Outside"
 #define BINDIR "bin"
-#define VAR_NAME_MAX_LENGTH 20
-#define VAR_VALUE_MAX_LENGTH 100
 #define ReadEnd 0
 #define WriteEnd 1
 
 // Utils
-
 void free_variable(Variable *var) {
 
     free(var->name);
@@ -241,7 +240,7 @@ int change_variable_value(Shell *shell, char *new_value, int index) {
         realloc(shell->env->list[index]->value, strlen(new_value) + 1);
     strcpy(shell->env->list[index]->value, new_value);
 
-    return 0;
+    return 1;
 }
 
 int history(Shell *shell) {
@@ -579,13 +578,56 @@ Shell *sh_init(void) {
     return shell;
 }
 
+void print_prompt(Shell *shell, int prompt) {
+
+    int index;
+    char *prmt;
+
+    if (prompt == 1)
+        prmt = "PROMPT";
+    else
+        prmt = "MULTI_PROMPT";
+
+    index = find_variable(prmt, shell->env->list, shell->env->num);
+    if (index != -1) {
+        change_color("cyan");
+        print("%s", shell->env->list[index]->value);
+        change_color("white");
+        print("> ");
+    }
+
+}
+
+int change_prompt(Shell *shell) {
+
+    int index = find_variable("PROMPT", shell->env->list, shell->env->num);
+    char *cwd, *cwd_;
+
+    if (index != -1) {
+        cwd = getcwd(NULL, 0);
+
+        if (cwd != NULL) {
+            cwd_ = strrchr(cwd, '/');
+            if (cwd_ != NULL) {
+                int res = change_variable_value(shell, cwd_ + 1, index);
+                free(cwd);
+                return res;
+            }
+            free(cwd);
+        }
+    }
+    perror("change_prompt");
+    return 1;
+}
+
+
 // BUILTINS
 char *builtin_str[] = {"cd",      "env",  "exit",     "export",
                        "history", "take", "inventory"};
 int sh_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int sh_cd(Shell *shell, int argc, char **args) {
-    UNUSED(shell);
+
     // Check if the player has the right to access the directory
     // If not, print a small text
     // print("I can't do that !\n Maybe I'm missing something...\n")
@@ -667,7 +709,7 @@ int sh_cd(Shell *shell, int argc, char **args) {
         }
     }
 
-    return cd(argc, args);
+    return !cd(argc, args) && change_prompt(shell);
 }
 
 int sh_env(Shell *shell, int argc, char **argv) {
@@ -767,13 +809,57 @@ int check_ast(Shell *shell, AST *ast, int *num_cmd) {
     if (ast->token->type == TOKEN_AMPER) {
         res = check_ast(shell, ast->children[0], num_cmd);
         if (ast->num_children > 1) {
-            res &= check_ast(shell, ast->children[0], num_cmd);
+            res = res && check_ast(shell, ast->children[1], num_cmd);
         }
         return res;
     }
 
     return check_ast(shell, ast->children[0], num_cmd) &&
            check_ast(shell, ast->children[1], num_cmd);
+}
+
+int is_cmd(Shell *shell, char *cmd) {
+
+    int res = 0;
+    char *tmp;
+
+    if ((tmp = find_command(shell, cmd)) != NULL) {
+        free(tmp);
+        res = 1;
+    } else if (check_builtin(cmd))
+        res = 1;
+
+    return res;
+}
+
+void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index,
+                 size_t cmd_len, int mutli) {
+
+    char tmp[cmd_len + 1];
+    strncpy(tmp, input, cmd_len);
+    tmp[cmd_len] = '\0';
+
+    change_color("cyan");
+    print("\33[2K\r%s", shell->env->list[cur_prompt]->value);
+    change_color("white");
+    print("> ");
+
+    if (!mutli) {
+        if (is_cmd(shell, tmp)) {
+            change_color("green");
+        } else
+            change_color("red");
+
+        print("%s", tmp);
+    }
+
+    change_color("white");
+    // print("%d - %d", start_index, cmd_len);
+
+    if (mutli)
+        print("%s", input + start_index);
+    else
+        print("%s", input + cmd_len);
 }
 
 /*
@@ -790,42 +876,76 @@ int check_ast(Shell *shell, AST *ast, int *num_cmd) {
  */
 char *read_cmd(Shell *shell, int *res) {
 
-    size_t i = 0, size = 1;
+    int cur_prompt = 1, sep = 0, i = 0, mutli = 0;
+    size_t size = 1, multi_index = 0, cmd_len = 0;
     ssize_t ret;
     unsigned char end = 0;
     char *cmd = malloc(sizeof(char));
 
-    while (!end && (ret = read(STDIN_FILENO, cmd + i, sizeof(char))) == 1) {
+    while (!end) {
 
-        if (cmd[i] == '\n') {
-            if (!i || cmd[i - 1] != '\\') {
-                if (!i) {
-                    cmd[i] = '\0';
+        ret = read(STDIN_FILENO, cmd + i, sizeof(char));
+
+        if (ret) {
+            if (cmd[i] == '\n') {
+                if (!i || cmd[i - 1] != '\\') {
+                    if (!i) {
+                        cmd[i] = '\0';
+                    }
+                    end = 1;
+                } else {
+                    print("\n%s", shell->env->list[2]->value);
+                    cur_prompt = 2;
+                    i -= 2;
+                    multi_index = (size_t)i;
+                    cmd_len = (size_t)i;
+                    mutli = 1;
                 }
-                end = 1;
-            } else {
-                print("%s", shell->env->list[2]->value);
-                i -= 2;
             }
+
+            if (iscntrl(cmd[i]) && cmd[i] != '\n' && !end) {
+                if (cmd[i] == 127 && i > 0) {
+                    if (i > 1)
+                        cmd[i - 1] = '\0';
+
+                    cmd[i] = '\0';
+                    i -= 2;
+                    if ((size_t)i == cmd_len)
+                        sep = 0;
+                } else {
+                    cmd[i] = '\0';
+                    --i;
+                }
+            }
+
+            if (i >= 0 && cmd[i] == ' ' && !sep)
+                sep = 1;
+
+            ++i;
+
+            if ((size_t)i == size) {
+                size *= 2;
+                cmd = realloc(cmd, sizeof(char) * size);
+                if (cmd == NULL)
+                    error("read_cmd realloc");
+            }
+
+            cmd[i] = '\0';
+            if (!sep)
+                cmd_len = (size_t)i;
+
+            parse_input(shell, cur_prompt, cmd, multi_index, cmd_len, mutli);
         }
 
-        ++i;
-
-        if (i == size) {
-            size *= 2;
-            cmd = realloc(cmd, sizeof(char) * size);
-            if (cmd == NULL) {
-                perror("read_cmd realloc");
-                end = 1;
-            }
-        }
+        if (ret == -1)
+            end = 1;
     }
 
     switch (ret) {
     case 0:
     case 1:
         cmd[i] = '\0';
-        cmd = realloc(cmd, sizeof(char) * (i + 1));
+        cmd = realloc(cmd, sizeof(char) * ((size_t)i + 1));
         if (cmd == NULL) {
             perror("read_cmd realloc");
         }
@@ -1030,7 +1150,7 @@ int sh_loop(Shell *shell, int debug) {
     AST *ast;
 
     while (shell->is_running) {
-        print("%s", shell->env->list[1]->value);
+        print_prompt(shell, 1);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
 
             if (check_cmd(command)) {
