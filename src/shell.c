@@ -141,7 +141,7 @@ int init_inventory(Shell *shell) {
 
     inv_path = realpath("game_directories/inventory", NULL);
 
-    if (inv_path == NULL)
+    if (inv_path == NULL) 
         error("init_inventory");
 
     res = export(shell, "INVENTORY", inv_path);

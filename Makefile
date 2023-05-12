@@ -38,7 +38,7 @@ EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_T
 
 
 multi:
-	$(MAKE) -j10 all
+	$(MAKE) -j4 all
 
 
 
