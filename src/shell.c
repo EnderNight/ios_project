@@ -1119,6 +1119,11 @@ int init_executor(AST *ast, Shell *shell, int num_cmd) {
                     return status;
             }
 
+            if (ast->token->type == TOKEN_AMPER) {
+                if (check_builtin(ast->children[0]->token->command[0]))
+                    status = init_executor(ast->children[0], shell, num_cmd);
+            }
+
             if (ast->num_children == 2) {
                 num_cmd = 0;
                 ast = ast->children[1];
