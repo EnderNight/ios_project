@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+CFLAGS="-Iinclude -O2"
+
+make

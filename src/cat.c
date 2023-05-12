@@ -7,13 +7,32 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <termios.h>
 
 #define UNUSED(x) (void)(x);
 
+struct termios orig_termios;
+
+void disableRawMode(void) {
+
+    struct termios role_back = orig_termios;
+
+    tcgetattr(STDIN_FILENO, &role_back);
+    role_back.c_lflag |= (ECHO | ICANON);
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &role_back);
+}
+
+void enableRawMode(void) {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
+
 int error(char *msg) {
     perror(msg);
+    enableRawMode();
     exit(-1);
 }
+
 
 int is_directory(char *path) {
 
@@ -33,6 +52,9 @@ int main(int argc, char **argv) {
 
     if (argc < 1)
         return EXIT_FAILURE;
+
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    disableRawMode();
 
     int fd;
     char *res;
@@ -99,5 +121,6 @@ int main(int argc, char **argv) {
         close(fd);
     }
 
+    enableRawMode();
     return EXIT_SUCCESS;
 }
