@@ -29,6 +29,7 @@
 #define ReadEnd 0
 #define WriteEnd 1
 
+
 // Utils
 void free_variable(Variable *var) {
 
@@ -140,7 +141,7 @@ int init_inventory(Shell *shell) {
 
     inv_path = realpath("game_directories/inventory", NULL);
 
-    if (inv_path == NULL)
+    if (inv_path == NULL) 
         error("init_inventory");
 
     res = export(shell, "INVENTORY", inv_path);
@@ -839,7 +840,7 @@ void parse_input(Shell *shell, int cur_prompt, char *input, size_t start_index,
     strncpy(tmp, input, cmd_len);
     tmp[cmd_len] = '\0';
 
-    change_color("cyan");
+    change_color("bigcyan");
     print("\33[2K\r%s", shell->env->list[cur_prompt]->value);
     change_color("white");
     print("> ");
@@ -934,7 +935,8 @@ char *read_cmd(Shell *shell, int *res) {
             if (!sep)
                 cmd_len = (size_t)i;
 
-            parse_input(shell, cur_prompt, cmd, multi_index, cmd_len, mutli);
+            if (!end)
+                parse_input(shell, cur_prompt, cmd, multi_index, cmd_len, mutli);
         }
 
         if (ret == -1)
@@ -963,6 +965,7 @@ char *read_cmd(Shell *shell, int *res) {
         cmd = NULL;
     }
 
+    print("\n");
     *res = (int)ret;
     return cmd;
 }
@@ -1096,17 +1099,29 @@ int init_executor(AST *ast, Shell *shell, int num_cmd) {
             num_cmd = 0;
             check_ast(shell, ast->children[0], &num_cmd);
 
+            if (check_builtin(ast->children[0]->token->command[0]))
+                exit(0);
             exit(init_executor(ast->children[0], shell, num_cmd));
         } else if (child == -1) {
             error("init_executor");
         } else {
             if (ast->token->type == TOKEN_SEMI) {
-                while (i > 0) {
-                    wait(&status);
-                    --i;
+
+                if (check_builtin(ast->children[0]->token->command[0])) {
+                    status = init_executor(ast->children[0], shell, num_cmd);
+                } else {
+                    while (i > 0) {
+                        wait(&status);
+                        --i;
+                    }
                 }
                 if (ast->num_children != 2)
                     return status;
+            }
+
+            if (ast->token->type == TOKEN_AMPER) {
+                if (check_builtin(ast->children[0]->token->command[0]))
+                    status = init_executor(ast->children[0], shell, num_cmd);
             }
 
             if (ast->num_children == 2) {
@@ -1152,6 +1167,7 @@ int sh_loop(Shell *shell, int debug) {
     while (shell->is_running) {
         print_prompt(shell, 1);
         if ((command = read_cmd(shell, &res)) != NULL && res) {
+
 
             if (check_cmd(command)) {
 

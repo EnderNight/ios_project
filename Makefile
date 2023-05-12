@@ -13,7 +13,7 @@ HEADERS ?= $(shell find $(INCDIR) -type f -name *.h)
 
 # Compiler variables
 CC ?= gcc
-CFLAGS += -I$(INCDIR) -Wall -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wformat-overflow -Wformat-truncation -Wundef -Wconversion -Wpedantic -g3 -fsanitize=address -std=gnu11
+CFLAGS ?= -I$(INCDIR) -Wall -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wformat-overflow -Wformat-truncation -Wundef -Wconversion -Wpedantic -g3 -fsanitize=address -std=gnu11
 LIBS = 
 
 
@@ -38,7 +38,7 @@ EXECUTABLES ?= $(MAIN_TARGET) $(WHEREAMI_TAR) $(INVENTORY_TAR) $(LS_TAR) $(MAN_T
 
 
 multi:
-	$(MAKE) -j10 all
+	$(MAKE) -j4 all
 
 
 

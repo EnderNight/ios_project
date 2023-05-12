@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+
+CFLAGS="-Iinclude -O2 -std=gnu11" make
+
