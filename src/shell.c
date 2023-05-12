@@ -1099,14 +1099,21 @@ int init_executor(AST *ast, Shell *shell, int num_cmd) {
             num_cmd = 0;
             check_ast(shell, ast->children[0], &num_cmd);
 
+            if (check_builtin(ast->children[0]->token->command[0]))
+                exit(0);
             exit(init_executor(ast->children[0], shell, num_cmd));
         } else if (child == -1) {
             error("init_executor");
         } else {
             if (ast->token->type == TOKEN_SEMI) {
-                while (i > 0) {
-                    wait(&status);
-                    --i;
+
+                if (check_builtin(ast->children[0]->token->command[0])) {
+                    status = init_executor(ast->children[0], shell, num_cmd);
+                } else {
+                    while (i > 0) {
+                        wait(&status);
+                        --i;
+                    }
                 }
                 if (ast->num_children != 2)
                     return status;
