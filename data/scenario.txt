@@ -111,14 +111,13 @@ a flamethrower. Its menacing presence seems out of place amidst the friend's too
 eccentricity or a passion for unique gadgets. The desk itself is cluttered with blueprints, technical manuals,
 and partially completed projects, further illustrating the engineer's scattered mindset.
 
-I I'm glad that my friend was able to at least finish building this before turning into an undead.
+I am glad that my friend was able to at least finish building this before turning into an undead.
 Thank you so much, my friend, I will put it to good use.
 /
 parking
 When I reach the parking, the worst suspicion that I have becomes true. My car is indeed there, but the
-front side is destroyed, and the battery is missing. If I want to use it to get out of here, I will have
-to repair it first. I have no idea where a new battery could be found, but I know that I can repair the
-car if I find one. I will have to search for it.
+front side is destroyed. If I want to use it to get out of here, I will have to repair it first.
+I might be able to understand if something is missing by checking the insides of it.
 /
 car
 I walk towards the car in the parking lot and notice that the keys are inside. 
