@@ -4,9 +4,9 @@
 - [x] read
 - [x] write
 - [x] readdir
-- [ ] lseek
-- [ ] link
-- [ ] unlink
+- [x] lseek
+- [x] link
+- [x] unlink
 - [x] stat
 
 # Library functions
@@ -22,19 +22,16 @@
 # Todo
 - [x] Pipes
 - [x] Each command should work without the shell
-- [ ] List last command used
-- [ ] All errors should be handled (with errno and without) 
-- [ ] All commands must have a man page
-- [ ] Code works on the server
+- [x] List last command used
+- [x] All errors should be handled (with errno and without) 
+- [x] All commands must have a man page
+- [x] Code works on the server
 
 
 # Project report
-- [ ] Explanation of where in the code each theoretical concept can be found
+- [x] Explanation of where in the code each theoretical concept can be found
 
 # Bonuses
-- [ ] Terminal characteristics
-- [ ] Images
-- [ ] Threads
-- [ ] &
-- [ ] Logs
-- [ ] Execution time
+- [x] Terminal characteristics
+- [x] &
+- [x] Syntax highlighting
