@@ -157,6 +157,7 @@ int init_env(Shell *shell) {
     bin_path = realpath(BINDIR, NULL);
 
     if (bin_path == NULL) {
+        print_err("Cannot find bin/ directory. Make sure that you are executing the shell inside the root directory of the repo\nor that the bin direcotry has not been deleted\n");
         perror("Init env");
         return -1;
     }
@@ -256,6 +257,11 @@ int history(Shell *shell) {
 
     if (hist_ind != -1 && cur_num_cmd_ind != -1) {
         hist_fd = open(shell->env->list[hist_ind]->value, O_APPEND | O_RDONLY);
+        if (hist_fd == -1) {
+            print_err("It looks like the .history file has been deleted.\nRestart the shell to create it.\n");
+            perror("history");
+            return 0;
+        }
         cur_num_cmd = atoi(shell->env->list[cur_num_cmd_ind]->value);
         buf = malloc(sizeof(char));
         if (buf == NULL)
@@ -719,90 +725,95 @@ int sh_env(Shell *shell, int argc, char **argv) {
 }
 
 int sh_exit(Shell *shell, int argc, char **argv) {
-    // We get the current directory
-    char path[456];
-    getcwd(path, sizeof path);
-    
-    // We get the path of the inventory
-    char *p = strstr(path, "ios_project");
-    p[0] = 0;
-    strcat(path, "ios_project/game_directories/inventory");
 
-    DIR *inventoryDir = opendir(path);
-    if (inventoryDir == NULL) {
-        perror("opendir() error");
+    if (argc == 1) {
+        // We get the current directory
+        char path[456];
+        getcwd(path, sizeof path);
+
+        // We get the path of the inventory
+        char *p = strstr(path, "ios_project");
+        p[0] = 0;
+        strcat(path, "ios_project/game_directories/inventory");
+
+        DIR *inventoryDir = opendir(path);
+        if (inventoryDir == NULL) {
+            perror("opendir() error");
+            return terminate(shell);
+        }
+
+        int foundknife = 0;
+        int foundflamethrower = 0;
+        int foundcar_battery = 0;
+
+        struct dirent *entry;
+        while ((entry = readdir(inventoryDir)) != NULL) {
+            if (strcmp(entry->d_name, "knife.item") == 0)
+            {
+                foundknife = 1;
+                remove("knife.item");
+            }
+            if (strcmp(entry->d_name, "flamethrower.item") == 0)
+            {
+                foundflamethrower = 1;
+                remove("flamethrower.item");
+            }
+            if (strcmp(entry->d_name, "car_battery.item") == 0) 
+            {
+                foundcar_battery = 1;
+                remove("car_battery.item");
+            }
+        }
+
+        // Explorer to get the directories where we put the items
+        if (foundknife) {
+            getcwd(path, sizeof path);
+            // We get the path of the inventory
+            char *p = strstr(path, "ios_project");
+            p[0] = 0;
+            strcat(path, "ios_project/story/start/friends_house/living_room/kitchen/knife.item");
+            if (access(path, F_OK) == -1) {
+                char* inventory_knife_path = "knife.item";
+                FILE* fp = fopen(path, "w");
+                fclose(fp);
+                remove(inventory_knife_path);
+            }
+        }
+
+        if (foundflamethrower) {
+            getcwd(path, sizeof path);
+            // We get the path of the inventory
+            char *p = strstr(path, "ios_project");
+            p[0] = 0;
+            strcat(path, "ios_project/story/start/friends_house/living_room/bedroom/kill_him/investigate/flamethrower.item");
+            if (access(path, F_OK) == -1) {
+                char* inventory_flamethrower_path = "flamethrower.item";
+                FILE* fp = fopen(path, "w");
+                fclose(fp);
+                remove(inventory_flamethrower_path);
+            }
+        }
+
+        if (foundcar_battery) {
+            getcwd(path, sizeof path);
+            // We get the path of the inventory
+            char *p = strstr(path, "ios_project");
+            p[0] = 0;
+            strcat(path, "ios_project/story/start/roundabout/mall/1f/2f/3f/car_battery.item");
+            if (access(path, F_OK) == -1) {
+                char* inventory_car_battery_path = "car_battery.item";
+                FILE* fp = fopen(path, "w");
+                fclose(fp);
+                remove(inventory_car_battery_path);
+            }
+        }
+
+        UNUSED(argv);
         return terminate(shell);
     }
 
-    int foundknife = 0;
-    int foundflamethrower = 0;
-    int foundcar_battery = 0;
-
-    struct dirent *entry;
-    while ((entry = readdir(inventoryDir)) != NULL) {
-        if (strcmp(entry->d_name, "knife.item") == 0)
-        {
-            foundknife = 1;
-            remove("knife.item");
-        }
-        if (strcmp(entry->d_name, "flamethrower.item") == 0)
-        {
-            foundflamethrower = 1;
-            remove("flamethrower.item");
-        }
-        if (strcmp(entry->d_name, "car_battery.item") == 0) 
-        {
-            foundcar_battery = 1;
-            remove("car_battery.item");
-        }
-    }
-
-    // Explorer to get the directories where we put the items
-    if (foundknife) {
-        getcwd(path, sizeof path);
-        // We get the path of the inventory
-        char *p = strstr(path, "ios_project");
-        p[0] = 0;
-        strcat(path, "ios_project/story/start/friends_house/living_room/kitchen/knife.item");
-        if (access(path, F_OK) == -1) {
-            char* inventory_knife_path = "knife.item";
-            FILE* fp = fopen(path, "w");
-            fclose(fp);
-            remove(inventory_knife_path);
-            }
-    }
-
-    if (foundflamethrower) {
-        getcwd(path, sizeof path);
-        // We get the path of the inventory
-        char *p = strstr(path, "ios_project");
-        p[0] = 0;
-        strcat(path, "ios_project/story/start/friends_house/living_room/bedroom/kill_him/investigate/flamethrower.item");
-        if (access(path, F_OK) == -1) {
-            char* inventory_flamethrower_path = "flamethrower.item";
-            FILE* fp = fopen(path, "w");
-            fclose(fp);
-            remove(inventory_flamethrower_path);
-            }
-    }
-
-    if (foundcar_battery) {
-        getcwd(path, sizeof path);
-        // We get the path of the inventory
-        char *p = strstr(path, "ios_project");
-        p[0] = 0;
-        strcat(path, "ios_project/story/start/roundabout/mall/1f/2f/3f/car_battery.item");
-        if (access(path, F_OK) == -1) {
-            char* inventory_car_battery_path = "car_battery.item";
-            FILE* fp = fopen(path, "w");
-            fclose(fp);
-            remove(inventory_car_battery_path);
-            }
-    }
-    
-    UNUSED(argc);
-    UNUSED(argv);
-    return terminate(shell);
+    print_err("Incorrect number of parameters. Usage: exit\n");
+    return 0;
 }
 
 int sh_export(Shell *shell, int argc, char **argv) {

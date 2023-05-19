@@ -17,6 +17,7 @@ int main(int argc, char **argv) {
     struct stat sb1;
 
     if (stat(argv[1], &sb1) == -1) {
+        print_err("Error with file '%s'\n", argv[1]);
         perror("rename");
         return 1;
     }
@@ -24,12 +25,14 @@ int main(int argc, char **argv) {
     if (S_ISREG(sb1.st_mode)) {
         link_res = link(argv[1], argv[2]);
         if (link_res == -1) {
+            print_err("Error with file '%s'\n", argv[2]);
             perror("rename");
             return 1;
         }
 
         unlink_res = unlink(argv[1]);
         if (unlink_res == -1) {
+            print_err("Error with file '%s'\n", argv[1]);
             perror("rename");
             return 1;
         }

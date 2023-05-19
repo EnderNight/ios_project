@@ -1,3 +1,4 @@
+#include "utils.h"
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -42,8 +43,10 @@ int is_directory(char *path) {
     if ((ret = stat(path, &sb)) == 0 && S_ISDIR(sb.st_mode))
         res = 1;
 
-    if (ret == -1)
+    if (ret == -1) {
+        print_err("Error with file '%s'\n", path);
         error("cat: cannot get file info");
+    }
 
     return res;
 }
@@ -77,8 +80,10 @@ int main(int argc, char **argv) {
                 fd = -2;
         }
 
-        if (fd == -1)
+        if (ret == -1) {
+            print_err("Error with file '%s'\n", argv[j + 1]);
             error("cat: cannot open file");
+        }
 
         while (!eof && fd != -2) {
 

@@ -80,10 +80,10 @@ $(MAN_TAR): $(MAN_OBJ) $(MAIN_TARGET)
 
 
 
-CAT_SRC = $(CAT_TAR).c
+CAT_SRC = $(CAT_TAR).c $(UTILS_TAR).c
 CAT_OBJ = $(patsubst %, $(BUILDDIR)/%, $(CAT_SRC:.c=.o))
  
-$(CAT_TAR): $(CAT_OBJ) $(MAIN_TARGET) 
+$(CAT_TAR): $(CAT_OBJ) $(MAIN_TARGET)
 	@mkdir -p bin
 	$(CC) $(CAT_OBJ) -o bin/$(CAT_TAR) $(LIBS) $(CFLAGS) 
 

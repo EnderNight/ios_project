@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
         shell = sh_init();
 
         if (shell == NULL) {
-            print("Error while shell bootstrap.");
+            print("Error while shell bootstrap.\n");
         } else {
             if (argc == 2)
                 debug = atoi(argv[1]);
@@ -85,9 +85,9 @@ int main(int argc, char **argv) {
             change_color("white");
 
             sh_loop(shell, debug);
+            sh_end(shell);
         }
 
-        sh_end(shell);
         disableRawMode();
         return 0;
     }
