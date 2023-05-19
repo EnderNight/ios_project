@@ -1,3 +1,1 @@
 cd start ; cd friends_house ; cd kitchen ; take ; cd .. ; cd living_room ; cd bedroom ; cd kill_him ; cd investigate ; take ; cd .. ; cd .. ;  cd .. ; cd .. ; cd .. ; cd roundabout ; cd mall ; cd 1f ; cd 2f ; cd 3f ; take ; cd .. ; cd .. ; cd .. ; cd .. ; cd parking ; cd car ; cd fix_car
-
-mv game_directories/inventory/knife.item story/start/friends_house/kitchen
